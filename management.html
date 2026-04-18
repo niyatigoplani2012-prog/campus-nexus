@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Management — Campus Nexus</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar" id="main-nav"></nav>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="/dashboard.html"><span class="nav-icon">📊</span>Overview</a></li>
+                <li><a href="/projects.html"><span class="nav-icon">🔬</span>Projects</a></li>
+                <li><a href="/applications.html"><span class="nav-icon">📋</span>Applications</a></li>
+                <li><a href="/events.html"><span class="nav-icon">📅</span>Events</a></li>
+                <li><a href="/messages.html"><span class="nav-icon">💬</span>Messages</a></li>
+                <li><a href="/management.html" class="active"><span class="nav-icon">🏗️</span>Management</a></li>
+                <li><a href="/profile.html"><span class="nav-icon">👤</span>Profile</a></li>
+            </ul>
+        </aside>
+        <main class="dashboard-content">
+            <div class="page-header animate-in">
+                <h2>🏗️ Team & Event Management</h2>
+                <p>Overview of your own projects, events, and performance stats.</p>
+            </div>
+
+            <!-- Stats grid -->
+            <div class="grid-cols-3 mb-3 animate-in animate-delay-1">
+                <div class="stat-card purple"><div class="stat-icon">🔭</div><div class="stat-number" id="mProjs">0</div><div class="stat-label">Projects Posted</div></div>
+                <div class="stat-card teal"><div class="stat-icon">📅</div><div class="stat-number" id="mEvents">0</div><div class="stat-label">Events Organized</div></div>
+                <div class="stat-card amber"><div class="stat-icon">📊</div><div class="stat-number" id="mApps">0</div><div class="stat-label">Pending Applicants</div></div>
+            </div>
+
+            <!-- Project Management -->
+            <div class="section-title mb-2 animate-in animate-delay-2">🔬 Active Project Teams</div>
+            <div id="mProjectsList" class="animate-in animate-delay-2">
+                <div class="loading-pulse" style="height:100px;"></div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Event Management -->
+            <div class="section-title mb-2 animate-in animate-delay-3">📅 Event Performance</div>
+            <div id="mEventsList" class="animate-in animate-delay-3">
+                <div class="loading-pulse" style="height:100px;"></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script>
+    const loadManagement = async () => {
+        const res = await fetch('/api/management/stats');
+        const data = await res.json();
+        if(!res.ok) return;
+
+        document.getElementById('mProjs').textContent = data.myProjects.length;
+        document.getElementById('mEvents').textContent = data.myEvents.length;
+        document.getElementById('mApps').textContent = data.myProjects.reduce((acc,p)=>acc+p.pending_count, 0);
+
+        const pL = document.getElementById('mProjectsList');
+        if(!data.myProjects.length) pL.innerHTML = `<div class="empty-state">No projects yet. <a href="/projects.html">Post one →</a></div>`;
+        else pL.innerHTML = data.myProjects.map(p => `
+            <div class="card">
+                <div class="flex-between mb-1">
+                    <h4 style="font-weight:700;">${p.title}</h4>
+                    <span class="badge badge-${p.status==='Open'?'teal':'closed'}">${p.status}</span>
+                </div>
+                <div style="display:flex;gap:1.5rem;font-size:0.85rem;color:var(--text-secondary);">
+                    <span>📋 ${p.app_count} Total Applications</span>
+                    <span>⏳ ${p.pending_count} Pending Review</span>
+                    <span>👥 Team size: ${p.team_size}</span>
+                </div>
+                <div style="margin-top:0.75rem;">
+                    <a href="/applications.html" class="btn btn-soft btn-sm">Review Applicants →</a>
+                </div>
+            </div>
+        `).join('');
+
+        const eL = document.getElementById('mEventsList');
+        if(!data.myEvents.length) eL.innerHTML = `<div class="empty-state">No events yet. <a href="/events.html">Create one →</a></div>`;
+        else eL.innerHTML = data.myEvents.map(e => {
+            const d = new Date(e.event_date);
+            return `<div class="card">
+                <div class="flex-between mb-1">
+                    <h4 style="font-weight:700;">${e.title}</h4>
+                    <span class="badge badge-purple">${e.event_type}</span>
+                </div>
+                <div style="display:flex;gap:1.5rem;font-size:0.85rem;color:var(--text-secondary);">
+                    <span>📅 ${d.toLocaleDateString()}</span>
+                    <span>👥 ${e.reg_count} / ${e.max_attendees||'∞'} Registered</span>
+                </div>
+            </div>`;
+        }).join('');
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        if(!await checkAuth()) return;
+        loadManagement();
+    });
+    </script>
+</body>
+</html>

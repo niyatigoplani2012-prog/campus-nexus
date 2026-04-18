@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up — Campus Nexus</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="auth-page">
+    <div class="auth-left">
+        <div class="auth-left-content">
+            <h1 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;color:var(--primary);margin-bottom:1rem;">Join the Community 🎓</h1>
+            <p style="color:var(--text-secondary);font-size:1rem;margin-bottom:2rem;">Campus Nexus is built by students, for students. Start your journey today.</p>
+            <div style="text-align:left;display:flex;flex-direction:column;gap:1.25rem;">
+                <div style="display:flex;gap:0.75rem;align-items:center;">
+                    <div class="feature-icon purple" style="width:40px;height:40px;margin:0;font-size:1.1rem;">⚡</div>
+                    <span style="font-weight:600;font-size:0.9rem;color:var(--text-secondary);">It's fast, free, and secure</span>
+                </div>
+                <div style="display:flex;gap:0.75rem;align-items:center;">
+                    <div class="feature-icon teal" style="width:40px;height:40px;margin:0;font-size:1.1rem;">🤝</div>
+                    <span style="font-weight:600;font-size:0.9rem;color:var(--text-secondary);">Collaborate with top students</span>
+                </div>
+                <div style="display:flex;gap:0.75rem;align-items:center;">
+                    <div class="feature-icon rose" style="width:40px;height:40px;margin:0;font-size:1.1rem;">🚀</div>
+                    <span style="font-weight:600;font-size:0.9rem;color:var(--text-secondary);">Launch your best projects</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="auth-right">
+        <div class="auth-form-container">
+            <a href="/index.html" class="nav-brand" style="display:block;margin-bottom:2.5rem;font-size:1.5rem;">🎓 Campus Nexus</a>
+            <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;margin-bottom:0.4rem;font-size:1.6rem;">Sign up</h2>
+            <p style="color:var(--text-muted);font-size:0.875rem;margin-bottom:2rem;">Already have an account? <a href="/login.html" style="color:var(--primary);font-weight:600;text-decoration:none;">Sign in →</a></p>
+            
+            <form id="registerForm">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <div class="input-icon-wrap">
+                        <span class="ico">👤</span>
+                        <input type="text" id="name" class="form-control" placeholder="John Doe" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>College Email</label>
+                    <div class="input-icon-wrap">
+                        <span class="ico">✉️</span>
+                        <input type="email" id="email" class="form-control" placeholder="you@college.edu" required>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    <label>Password</label>
+                    <div class="input-icon-wrap">
+                        <span class="ico">🔒</span>
+                        <input type="password" id="password" class="form-control" placeholder="Create a strong password" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-full" id="sb-btn">Sign Up Free</button>
+                <div id="regMsg" style="margin-top:1.25rem;font-size:0.875rem;text-align:center;"></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('sb-btn');
+            btn.textContent = 'Joining...'; btn.disabled = true;
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    window.location.href = '/dashboard.html';
+                } else {
+                    document.getElementById('regMsg').innerHTML = `<span style="color:var(--accent-rose)">✕ ${data.error}</span>`;
+                    btn.textContent = 'Sign Up Free'; btn.disabled = false;
+                }
+            } catch (err) {
+                document.getElementById('regMsg').innerHTML = `<span style="color:var(--accent-rose)">✕ Connection error</span>`;
+                btn.textContent = 'Sign Up Free'; btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

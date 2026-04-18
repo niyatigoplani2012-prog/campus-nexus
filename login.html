@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In — Campus Nexus</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="auth-page">
+    <div class="auth-left">
+        <div class="auth-left-content">
+            <h1 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;color:var(--primary);margin-bottom:1rem;">Welcome Back! 👋</h1>
+            <p style="color:var(--text-secondary);font-size:1rem;margin-bottom:2rem;">Sign in to continue building, collaborating, and connecting with your campus community.</p>
+            <div style="text-align:left;display:flex;flex-direction:column;gap:1.25rem;">
+                <div style="display:flex;gap:0.75rem;align-items:center;">
+                    <div class="feature-icon purple" style="width:40px;height:40px;margin:0;font-size:1.1rem;">🔬</div>
+                    <span style="font-weight:600;font-size:0.9rem;color:var(--text-secondary);">Browse & apply to projects</span>
+                </div>
+                <div style="display:flex;gap:0.75rem;align-items:center;">
+                    <div class="feature-icon teal" style="width:40px;height:40px;margin:0;font-size:1.1rem;">📅</div>
+                    <span style="font-weight:600;font-size:0.9rem;color:var(--text-secondary);">Register for upcoming events</span>
+                </div>
+                <div style="display:flex;gap:0.75rem;align-items:center;">
+                    <div class="feature-icon rose" style="width:40px;height:40px;margin:0;font-size:1.1rem;">💬</div>
+                    <span style="font-weight:600;font-size:0.9rem;color:var(--text-secondary);">Chat with your teammates</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="auth-right">
+        <div class="auth-form-container">
+            <a href="/index.html" class="nav-brand" style="display:block;margin-bottom:2.5rem;font-size:1.5rem;">🎓 Campus Nexus</a>
+            <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;margin-bottom:0.4rem;font-size:1.6rem;">Sign in</h2>
+            <p style="color:var(--text-muted);font-size:0.875rem;margin-bottom:2rem;">Don't have an account? <a href="/register.html" style="color:var(--primary);font-weight:600;text-decoration:none;">Sign up free →</a></p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>College Email</label>
+                    <div class="input-icon-wrap">
+                        <span class="ico">✉️</span>
+                        <input type="email" id="email" class="form-control" placeholder="you@college.edu" required>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:0.5rem;">
+                    <label>Password</label>
+                    <div class="input-icon-wrap">
+                        <span class="ico">🔒</span>
+                        <input type="password" id="password" class="form-control" placeholder="Your password" required>
+                    </div>
+                </div>
+                <div style="text-align:right;margin-bottom:1.5rem;">
+                    <a href="#" style="font-size:0.78rem;color:var(--text-muted);text-decoration:none;">Forgot password?</a>
+                </div>
+                <button type="submit" class="btn btn-primary w-full" id="sb-btn">Sign In</button>
+                <div id="loginMsg" style="margin-top:1.25rem;font-size:0.875rem;text-align:center;"></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('sb-btn');
+            btn.textContent = 'Signing in...'; btn.disabled = true;
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    window.location.href = '/dashboard.html';
+                } else {
+                    document.getElementById('loginMsg').innerHTML = `<span style="color:var(--accent-rose)">✕ ${data.error}</span>`;
+                    btn.textContent = 'Sign In'; btn.disabled = false;
+                }
+            } catch (err) {
+                document.getElementById('loginMsg').innerHTML = `<span style="color:var(--accent-rose)">✕ Connection error</span>`;
+                btn.textContent = 'Sign In'; btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

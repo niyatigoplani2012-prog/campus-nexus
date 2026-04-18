@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applications — Campus Nexus</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .timeline { display:flex; gap:0.5rem; align-items:center; margin:0.5rem 0 0.75rem; }
+        .timeline-step { display:flex; align-items:center; gap:0.3rem; font-size:0.72rem; font-weight:600; }
+        .timeline-dot { width:10px; height:10px; border-radius:50%; }
+        .timeline-line { flex:1; height:2px; background:var(--border); max-width:40px; }
+        .step-done .timeline-dot { background:var(--accent-teal); }
+        .step-active .timeline-dot { background:var(--accent-amber); }
+        .step-pending .timeline-dot { background:var(--border); }
+    </style>
+</head>
+<body>
+    <nav class="navbar" id="main-nav"></nav>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="/dashboard.html"><span class="nav-icon">📊</span>Overview</a></li>
+                <li><a href="/projects.html"><span class="nav-icon">🔬</span>Projects</a></li>
+                <li><a href="/applications.html" class="active"><span class="nav-icon">📋</span>Applications</a></li>
+                <li><a href="/events.html"><span class="nav-icon">📅</span>Events</a></li>
+                <li><a href="/messages.html"><span class="nav-icon">💬</span>Messages</a></li>
+                <li><a href="/management.html"><span class="nav-icon">🏗️</span>Management</a></li>
+                <li><a href="/profile.html"><span class="nav-icon">👤</span>Profile</a></li>
+            </ul>
+        </aside>
+        <main class="dashboard-content">
+            <div class="page-header animate-in">
+                <h2>📋 Applications</h2>
+                <p>Manage who's joining your projects and track your own applications.</p>
+            </div>
+
+            <!-- Stats row -->
+            <div class="grid-cols-4 mb-3 animate-in animate-delay-1">
+                <div class="stat-card purple"><div class="stat-icon">📬</div><div class="stat-number" id="rcvTotal">—</div><div class="stat-label">Received</div></div>
+                <div class="stat-card amber"><div class="stat-icon">⏳</div><div class="stat-number" id="rcvPending">—</div><div class="stat-label">Pending Review</div></div>
+                <div class="stat-card teal"><div class="stat-icon">✅</div><div class="stat-number" id="sentTotal">—</div><div class="stat-label">I Applied To</div></div>
+                <div class="stat-card rose"><div class="stat-icon">🎯</div><div class="stat-number" id="sentAccepted">—</div><div class="stat-label">Accepted</div></div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs animate-in animate-delay-2" data-tab-group="apps">
+                <button class="tab-btn active" data-tab="received" onclick="switchTab('apps','received')">📬 Received</button>
+                <button class="tab-btn" data-tab="sent" onclick="switchTab('apps','sent')">📤 Sent by Me</button>
+            </div>
+
+            <!-- Received tab -->
+            <div data-tab-content="apps" data-tab="received" class="tab-panel active">
+                <div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;">
+                    <button class="btn btn-soft btn-sm active-filter" onclick="applyFilter('received','all',this)">All</button>
+                    <button class="btn btn-ghost btn-sm" onclick="applyFilter('received','Pending',this)">⏳ Pending</button>
+                    <button class="btn btn-ghost btn-sm" onclick="applyFilter('received','Accepted',this)">✅ Accepted</button>
+                    <button class="btn btn-ghost btn-sm" onclick="applyFilter('received','Rejected',this)">❌ Rejected</button>
+                </div>
+                <div id="receivedList">
+                    <div class="loading-pulse" style="height:100px;"></div>
+                    <div class="loading-pulse" style="height:100px;margin-top:0.75rem;"></div>
+                </div>
+            </div>
+
+            <!-- Sent tab -->
+            <div data-tab-content="apps" data-tab="sent" class="tab-panel">
+                <div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;">
+                    <button class="btn btn-soft btn-sm active-filter" onclick="applyFilter('sent','all',this)">All</button>
+                    <button class="btn btn-ghost btn-sm" onclick="applyFilter('sent','Pending',this)">⏳ Pending</button>
+                    <button class="btn btn-ghost btn-sm" onclick="applyFilter('sent','Accepted',this)">✅ Accepted</button>
+                    <button class="btn btn-ghost btn-sm" onclick="applyFilter('sent','Rejected',this)">❌ Rejected</button>
+                </div>
+                <div id="sentList">
+                    <div class="loading-pulse" style="height:80px;"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script>
+    let rcvApps = [], sentApps = [];
+    let rcvFilter = 'all', sentFilter = 'all';
+
+    function applyFilter(type, val, btn) {
+        document.querySelectorAll(`#${type==='received'?'receivedList':'sentList'}`).forEach(()=>{});
+        document.querySelectorAll(`.active-filter`).forEach(b=>{ if(b.closest(`[data-tab="${type}"]`)||true){ b.className='btn btn-ghost btn-sm'; } });
+        btn.className = 'btn btn-soft btn-sm active-filter';
+        if (type==='received') { rcvFilter = val; renderReceived(); }
+        else { sentFilter = val; renderSent(); }
+    }
+
+    const statusBadge = s => {
+        const map = { Pending:'badge-pending', Accepted:'badge-accepted', Rejected:'badge-rejected' };
+        const ic = { Pending:'⏳', Accepted:'✅', Rejected:'❌' };
+        return `<span class="badge ${map[s]||'badge-pending'}">${ic[s]||''} ${s}</span>`;
+    };
+
+    const timeline = status => {
+        const steps = ['Applied','Under Review','Decision'];
+        const idx = status==='Pending'?1:2;
+        return `<div class="timeline">${steps.map((s,i)=>`
+            <div class="timeline-step ${i<idx?'step-done':i===idx?'step-active':'step-pending'}">
+                <div class="timeline-dot"></div>
+                <span style="color:${i<=idx?'var(--text-secondary)':'var(--text-muted)'}">${s}</span>
+            </div>${i<steps.length-1?'<div class="timeline-line"></div>':''}
+        `).join('')}</div>`;
+    };
+
+    const renderReceived = () => {
+        const c = document.getElementById('receivedList');
+        const list = rcvFilter==='all' ? rcvApps : rcvApps.filter(a=>a.status===rcvFilter);
+        if (!list.length) { c.innerHTML=`<div class="empty-state"><div class="emoji">📬</div><h3>No applications here</h3><p>No one has applied to your projects yet${rcvFilter!=='all'?' with this status':''}.</p></div>`; return; }
+        c.innerHTML = list.map(a=>`
+            <div class="card" style="border-left:3px solid ${a.status==='Accepted'?'var(--accent-teal)':a.status==='Rejected'?'var(--accent-rose)':'var(--accent-amber)'}">
+                <div class="flex-between mb-2">
+                    <div style="display:flex;gap:0.75rem;align-items:center;">
+                        <div style="width:40px;height:40px;background:linear-gradient(135deg,var(--primary),var(--accent-teal));border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:1.1rem;">${a.applicant_name[0].toUpperCase()}</div>
+                        <div>
+                            <div style="font-weight:700;">${a.applicant_name}</div>
+                            <div style="font-size:0.78rem;color:var(--text-muted);">For: <strong style="color:var(--text-secondary);">${a.project_title}</strong></div>
+                        </div>
+                    </div>
+                    ${statusBadge(a.status)}
+                </div>
+                ${a.applicant_skills ? `<div style="margin-bottom:0.5rem;">${a.applicant_skills.split(',').map(s=>`<span class="skill-tag">${s.trim()}</span>`).join('')}</div>` : ''}
+                ${a.message ? `<div class="card-flat" style="margin-bottom:0.75rem;font-size:0.85rem;color:var(--text-secondary);">💬 "<em>${a.message}</em>"</div>` : ''}
+                ${timeline(a.status)}
+                ${a.status==='Pending' ? `<div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+                    <button class="btn btn-success btn-sm" onclick="updateApp(${a.id},'Accepted')">✓ Accept</button>
+                    <button class="btn btn-rose btn-sm" onclick="updateApp(${a.id},'Rejected')">✕ Reject</button>
+                    <a href="/messages.html?to=${a.applicant_id}" class="btn btn-soft-teal btn-sm">💬 Message</a>
+                </div>` : `<a href="/messages.html?to=${a.applicant_id}" class="btn btn-ghost btn-sm">💬 Message</a>`}
+            </div>`).join('');
+    };
+
+    const renderSent = () => {
+        const c = document.getElementById('sentList');
+        const list = sentFilter==='all' ? sentApps : sentApps.filter(a=>a.status===sentFilter);
+        if (!list.length) { c.innerHTML=`<div class="empty-state"><div class="emoji">📤</div><h3>No applications sent</h3><p>You haven't applied to any projects yet${sentFilter!=='all'?' with this status':''}.</p><a href="/projects.html" class="btn btn-primary btn-sm" style="margin-top:1rem;">Browse Projects</a></div>`; return; }
+        c.innerHTML = list.map(a=>`
+            <div class="card" style="border-left:3px solid ${a.status==='Accepted'?'var(--accent-teal)':a.status==='Rejected'?'var(--accent-rose)':'var(--accent-amber)'}">
+                <div class="flex-between mb-2">
+                    <div>
+                        <h4 style="font-weight:700;">${a.project_title}</h4>
+                        <span style="font-size:0.78rem;color:var(--text-muted);">by ${a.owner_name} &nbsp;·&nbsp; ${a.category||'General'} &nbsp;·&nbsp; Applied ${new Date(a.created_at).toLocaleDateString()}</span>
+                    </div>
+                    ${statusBadge(a.status)}
+                </div>
+                ${a.message ? `<div class="card-flat" style="margin-bottom:0.75rem;font-size:0.85rem;color:var(--text-secondary);">Your note: "<em>${a.message}</em>"</div>` : ''}
+                ${timeline(a.status)}
+                ${a.status==='Accepted' ? `<div class="info-box">🎉 Congratulations! You were accepted. <a href="/messages.html" style="color:var(--primary);margin-left:0.5rem;">Message your team →</a></div>` : ''}
+            </div>`).join('');
+    };
+
+    async function updateApp(id, status) {
+        const res = await fetch(`/api/applications/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status}) });
+        if (res.ok) await loadAll();
+        else alert('Failed to update');
+    }
+
+    const loadAll = async () => {
+        const [r1, r2] = await Promise.all([fetch('/api/applications/received'), fetch('/api/applications/sent')]);
+        rcvApps = await r1.json(); sentApps = await r2.json();
+        document.getElementById('rcvTotal').textContent = rcvApps.length;
+        document.getElementById('rcvPending').textContent = rcvApps.filter(a=>a.status==='Pending').length;
+        document.getElementById('sentTotal').textContent = sentApps.length;
+        document.getElementById('sentAccepted').textContent = sentApps.filter(a=>a.status==='Accepted').length;
+        renderReceived(); renderSent();
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        if (!await checkAuth()) return;
+        await loadAll();
+    });
+    </script>
+</body>
+</html>

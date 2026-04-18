@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events — Campus Nexus</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar" id="main-nav"></nav>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="/dashboard.html"><span class="nav-icon">📊</span>Overview</a></li>
+                <li><a href="/projects.html"><span class="nav-icon">🔬</span>Projects</a></li>
+                <li><a href="/applications.html"><span class="nav-icon">📋</span>Applications</a></li>
+                <li><a href="/events.html" class="active"><span class="nav-icon">📅</span>Events</a></li>
+                <li><a href="/messages.html"><span class="nav-icon">💬</span>Messages</a></li>
+                <li><a href="/management.html"><span class="nav-icon">🏗️</span>Management</a></li>
+                <li><a href="/profile.html"><span class="nav-icon">👤</span>Profile</a></li>
+            </ul>
+        </aside>
+        <main class="dashboard-content">
+            <div class="page-header animate-in">
+                <div class="flex-between">
+                    <div><h2>📅 Events & Hackathons</h2><p>Discover and register for campus events.</p></div>
+                    <button class="btn btn-teal" onclick="toggleForm()" id="newEventBtn">+ Post Event</button>
+                </div>
+            </div>
+
+            <!-- Post Form -->
+            <div class="card animate-in" id="eventFormCard" style="display:none; border-left:4px solid var(--accent-teal);">
+                <div class="section-title mb-3">🎉 Create New Event</div>
+                <form id="postEventForm">
+                    <div class="grid-cols-2">
+                        <div class="form-group">
+                            <label>Event Title *</label>
+                            <input type="text" id="etitle" class="form-control" required placeholder="e.g. Spring Hackathon 2025">
+                        </div>
+                        <div class="form-group">
+                            <label>Event Type</label>
+                            <select id="etype" class="form-control">
+                                <option value="Hackathon">🏆 Hackathon</option>
+                                <option value="Workshop">🛠️ Workshop</option>
+                                <option value="Seminar">🎤 Seminar</option>
+                                <option value="Competition">🥇 Competition</option>
+                                <option value="Meetup">☕ Meetup</option>
+                                <option value="General">📌 General</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description *</label>
+                        <textarea id="edesc" class="form-control" required placeholder="Describe the event, prizes, schedule, requirements..."></textarea>
+                    </div>
+                    <div class="grid-cols-3">
+                        <div class="form-group">
+                            <label>Event Date *</label>
+                            <input type="date" id="edate" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Location</label>
+                            <input type="text" id="elocation" class="form-control" placeholder="e.g. Main Auditorium / Online">
+                        </div>
+                        <div class="form-group">
+                            <label>Max Attendees</label>
+                            <input type="number" id="emax" class="form-control" min="0" placeholder="0 = unlimited">
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:1rem;align-items:center;">
+                        <button type="submit" class="btn btn-teal" id="postEventBtn">🎉 Post Event</button>
+                        <button type="button" class="btn btn-ghost" onclick="toggleForm()">Cancel</button>
+                        <span id="eventPostMsg" style="font-size:0.85rem;"></span>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tabs: Upcoming / Past / My Events -->
+            <div class="tabs animate-in animate-delay-1" data-tab-group="events">
+                <button class="tab-btn active" data-tab="upcoming" onclick="switchTab('events','upcoming')">🗓 Upcoming</button>
+                <button class="tab-btn" data-tab="past" onclick="switchTab('events','past')">🕐 Past</button>
+                <button class="tab-btn" data-tab="mine" onclick="switchTab('events','mine')">⭐ My Events</button>
+            </div>
+
+            <div data-tab-content="events" data-tab="upcoming" class="tab-panel active" id="upcomingList">
+                <div class="loading-pulse" style="height:90px;"></div>
+                <div class="loading-pulse" style="height:90px;margin-top:0.75rem;"></div>
+            </div>
+            <div data-tab-content="events" data-tab="past" class="tab-panel" id="pastList"></div>
+            <div data-tab-content="events" data-tab="mine" class="tab-panel" id="myEventsList"></div>
+        </main>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script>
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const ETYPE_COLORS = { Hackathon:'rose', Workshop:'amber', Seminar:'blue', Competition:'rose', Meetup:'teal', General:'purple' };
+    const ETYPE_IC = { Hackathon:'🏆', Workshop:'🛠️', Seminar:'🎤', Competition:'🥇', Meetup:'☕', General:'📌' };
+
+    let allEvents = [], currentUser = null;
+
+    function toggleForm() {
+        const c = document.getElementById('eventFormCard'), btn = document.getElementById('newEventBtn');
+        const show = c.style.display === 'none';
+        c.style.display = show ? 'block' : 'none';
+        btn.textContent = show ? '✕ Close' : '+ Post Event';
+    }
+
+    const renderEvents = (events, containerId, showOwnActions) => {
+        const c = document.getElementById(containerId);
+        if (!events.length) { c.innerHTML=`<div class="empty-state"><div class="emoji">📅</div><h3>No events here</h3><p>No events to show right now.</p></div>`; return; }
+        c.innerHTML = events.map(e => {
+            const d = new Date(e.event_date + 'T00:00:00');
+            const isPast = d < new Date();
+            const isOwner = currentUser && e.organizer_id === currentUser.id;
+            const capacity = e.max_attendees > 0 ? `${e.attendee_count}/${e.max_attendees}` : `${e.attendee_count} registered`;
+            const isFull = e.max_attendees > 0 && e.attendee_count >= e.max_attendees;
+            return `<div class="event-card">
+                <div class="event-date-box">
+                    <div class="day">${d.getDate()}</div>
+                    <div class="month">${MONTHS[d.getMonth()]}</div>
+                </div>
+                <div style="flex:1;">
+                    <div class="flex-between mb-1">
+                        <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+                            <h4 style="font-weight:700;font-size:1rem;">${e.title}</h4>
+                            <span class="badge badge-${ETYPE_COLORS[e.event_type]||'purple'}">${ETYPE_IC[e.event_type]||'📌'} ${e.event_type||'General'}</span>
+                            ${isPast ? '<span class="badge badge-closed">Past</span>' : '<span class="badge badge-teal">Upcoming</span>'}
+                        </div>
+                        ${isOwner && showOwnActions ? `<button class="btn btn-soft-rose btn-sm" onclick="deleteEvent(${e.id})">🗑</button>` : ''}
+                    </div>
+                    <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.5rem;">${e.description}</p>
+                    <div style="display:flex;gap:1rem;flex-wrap:wrap;font-size:0.78rem;color:var(--text-muted);margin-bottom:0.65rem;">
+                        ${e.location ? `<span>📍 ${e.location}</span>` : ''}
+                        <span>👥 ${capacity}</span>
+                        <span>🎙️ ${e.organizer_name}</span>
+                    </div>
+                    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;">
+                        ${!isPast && !isOwner && !isFull ? `<button class="btn btn-teal btn-sm" onclick="registerEvent(${e.id},this)">Register Interest ✓</button>` :
+                          isFull ? `<span class="badge badge-rose">🚫 Full</span>` :
+                          isOwner ? `<span class="badge badge-purple">Your Event</span>` : ''}
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    };
+
+    async function registerEvent(id, btn) {
+        btn.textContent = 'Registering...'; btn.disabled = true;
+        const res = await fetch(`/api/events/${id}/register`, { method:'POST' });
+        if (res.ok) { btn.textContent = '✓ Registered!'; btn.className = 'btn btn-success btn-sm'; await loadEvents(); }
+        else { const d = await res.json(); btn.textContent = d.error==='Already registered' ? '⚡ Already Registered' : '✕ Failed'; btn.className = 'btn btn-ghost btn-sm'; btn.disabled = false; }
+    }
+
+    async function deleteEvent(id) {
+        if (!confirm('Delete this event?')) return;
+        const res = await fetch(`/api/events/${id}`, { method:'DELETE' });
+        if (res.ok) await loadEvents();
+        else alert('Failed to delete');
+    }
+
+    const loadEvents = async () => {
+        const res = await fetch('/api/events');
+        allEvents = await res.json();
+        const now = new Date();
+        const upcoming = allEvents.filter(e => new Date(e.event_date) >= new Date(now.toDateString()));
+        const past = allEvents.filter(e => new Date(e.event_date) < new Date(now.toDateString()));
+        const mine = allEvents.filter(e => currentUser && e.organizer_id === currentUser.id);
+        renderEvents(upcoming, 'upcomingList', false);
+        renderEvents(past, 'pastList', false);
+        renderEvents(mine, 'myEventsList', true);
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        currentUser = await checkAuth(); if (!currentUser) return;
+        await loadEvents();
+        document.getElementById('postEventForm').addEventListener('submit', async e => {
+            e.preventDefault();
+            const btn = document.getElementById('postEventBtn'); btn.textContent = 'Posting...'; btn.disabled = true;
+            const res = await fetch('/api/events', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ title:document.getElementById('etitle').value, description:document.getElementById('edesc').value, event_date:document.getElementById('edate').value, event_type:document.getElementById('etype').value, location:document.getElementById('elocation').value, max_attendees:document.getElementById('emax').value||0 }) });
+            if (res.ok) { showMessage('eventPostMsg','✓ Event posted!'); document.getElementById('postEventForm').reset(); toggleForm(); await loadEvents(); }
+            else { showMessage('eventPostMsg','✕ Failed',true); }
+            btn.textContent = '🎉 Post Event'; btn.disabled = false;
+        });
+    });
+    </script>
+</body>
+</html>

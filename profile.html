@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile — Campus Nexus</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar" id="main-nav"></nav>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="/dashboard.html"><span class="nav-icon">📊</span>Overview</a></li>
+                <li><a href="/projects.html"><span class="nav-icon">🔬</span>Projects</a></li>
+                <li><a href="/applications.html"><span class="nav-icon">📋</span>Applications</a></li>
+                <li><a href="/events.html"><span class="nav-icon">📅</span>Events</a></li>
+                <li><a href="/messages.html"><span class="nav-icon">💬</span>Messages</a></li>
+                <li><a href="/management.html"><span class="nav-icon">🏗️</span>Management</a></li>
+                <li><a href="/profile.html" class="active"><span class="nav-icon">👤</span>Profile</a></li>
+            </ul>
+        </aside>
+        <main class="dashboard-content">
+            <div class="page-header animate-in">
+                <h2>👤 My Profile</h2>
+                <p>Manage your identity and showcase your skills to potential teammates.</p>
+            </div>
+
+            <div class="grid-cols-3 animate-in animate-delay-1" style="grid-template-columns: 1fr 2fr; gap: 2rem;">
+                <!-- Profile card -->
+                <div>
+                <div class="card" style="padding:0; overflow:hidden; position:sticky; top:20px;">
+                    <div class="profile-banner">
+                        <div class="avatar-ring" id="avatar">U</div>
+                    </div>
+                    <div style="padding:3.5rem 1.5rem 2rem; text-align:center;">
+                        <h2 id="pName" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:0.25rem;">Student Name</h2>
+                        <p id="pEmail" style="color:var(--text-muted);font-size:0.875rem;margin-bottom:1.5rem;">email@college.edu</p>
+                        
+                        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:0.5rem;margin-bottom:1.5rem;">
+                            <span class="badge badge-purple" id="pDept">Department</span>
+                            <span class="badge badge-teal" id="pYear">Year —</span>
+                        </div>
+
+                        <div class="divider"></div>
+                        
+                        <div style="text-align:left; margin-bottom:1.5rem;">
+                            <p style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);font-weight:700;margin-bottom:0.5rem;">Bio</p>
+                            <p id="pBio" style="font-size:0.875rem;color:var(--text-secondary);line-height:1.6;">No bio added yet.</p>
+                        </div>
+
+                        <div style="text-align:left; margin-bottom:1.5rem;">
+                            <p style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);font-weight:700;margin-bottom:0.5rem;">Skills</p>
+                            <div id="pSkills">
+                                <span class="text-muted" style="font-size:0.8rem;">No skills listed.</span>
+                            </div>
+                        </div>
+
+                        <div style="display:flex;gap:1rem;justify-content:center;margin-bottom:1.5rem;">
+                            <a id="pGit" href="#" target="_blank" style="font-size:1.5rem;text-decoration:none;">🐙</a>
+                            <a id="pLin" href="#" target="_blank" style="font-size:1.5rem;text-decoration:none;">🏢</a>
+                        </div>
+
+                        <button class="btn btn-soft-rose btn-sm w-full" onclick="logout()">Sign Out</button>
+                    </div>
+                </div>
+                </div>
+
+                <!-- Edit section -->
+                <div class="card animate-in animate-delay-2" style="border-left:4px solid var(--primary);">
+                    <h3 class="section-title mb-3">✏️ Edit Profile Info</h3>
+                    <form id="profileForm">
+                        <div class="grid-cols-2">
+                            <div class="form-group">
+                                <label>Department / Major</label>
+                                <input type="text" id="iDept" class="form-control" placeholder="e.g. Computer Science">
+                            </div>
+                            <div class="form-group">
+                                <label>Year of Study</label>
+                                <select id="iYear" class="form-control">
+                                    <option value="">Select Year</option>
+                                    <option value="1">1st Year</option>
+                                    <option value="2">2nd Year</option>
+                                    <option value="3">3rd Year</option>
+                                    <option value="4">4th Year</option>
+                                    <option value="5">Grad / Masters</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Short Bio</label>
+                            <textarea id="iBio" class="form-control" placeholder="A bit about yourself..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Skills (comma separated)</label>
+                            <input type="text" id="iSkills" class="form-control" placeholder="React, Python, Figma, SQL">
+                        </div>
+                        <div class="grid-cols-2">
+                            <div class="form-group">
+                                <label>GitHub URL</label>
+                                <input type="url" id="iGit" class="form-control" placeholder="https://github.com/yourusername">
+                            </div>
+                            <div class="form-group">
+                                <label>LinkedIn URL</label>
+                                <input type="url" id="iLin" class="form-control" placeholder="https://linkedin.com/in/yourusername">
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:1rem;align-items:center;">
+                            <button type="submit" class="btn btn-primary" id="saveBtn">💾 Save Changes</button>
+                            <span id="saveMsg" style="font-size:0.85rem;"></span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script>
+    const loadProfile = async () => {
+        const user = await checkAuth();
+        if(!user) return;
+
+        document.getElementById('pName').textContent = user.name;
+        document.getElementById('pEmail').textContent = user.email;
+        document.getElementById('avatar').textContent = user.name[0].toUpperCase();
+        document.getElementById('pDept').textContent = user.department || 'Not set';
+        document.getElementById('pYear').textContent = user.year ? `${user.year}${user.year==1?'st':user.year==2?'nd':user.year==3?'rd':'th'} Year` : 'Year —';
+        document.getElementById('pBio').textContent = user.bio || 'No bio added yet.';
+        
+        const skills = (user.skills||'').split(',').filter(Boolean).map(s=>`<span class="skill-tag">${s.trim()}</span>`).join('');
+        document.getElementById('pSkills').innerHTML = skills || '<span class="text-muted" style="font-size:0.8rem;">No skills listed.</span>';
+        
+        document.getElementById('pGit').href = user.github || '#';
+        document.getElementById('pGit').style.opacity = user.github ? '1' : '0.2';
+        document.getElementById('pLin').href = user.linkedin || '#';
+        document.getElementById('pLin').style.opacity = user.linkedin ? '1' : '0.2';
+
+        // Preload form
+        document.getElementById('iDept').value = user.department || '';
+        document.getElementById('iYear').value = user.year || '';
+        document.getElementById('iBio').value = user.bio || '';
+        document.getElementById('iSkills').value = user.skills || '';
+        document.getElementById('iGit').value = user.github || '';
+        document.getElementById('iLin').value = user.linkedin || '';
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadProfile();
+        document.getElementById('profileForm').addEventListener('submit', async e => {
+            e.preventDefault();
+            const btn = document.getElementById('saveBtn');
+            btn.textContent = 'Saving...'; btn.disabled = true;
+
+            const res = await fetch('/api/users/profile', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    department: document.getElementById('iDept').value,
+                    year: document.getElementById('iYear').value,
+                    bio: document.getElementById('iBio').value,
+                    skills: document.getElementById('iSkills').value,
+                    github: document.getElementById('iGit').value,
+                    linkedin: document.getElementById('iLin').value
+                })
+            });
+
+            if(res.ok) {
+                showMessage('saveMsg','✓ Profile updated!');
+                loadProfile();
+            } else {
+                showMessage('saveMsg','✕ Update failed', true);
+            }
+            btn.textContent = '💾 Save Changes'; btn.disabled = false;
+        });
+    });
+    </script>
+</body>
+</html>

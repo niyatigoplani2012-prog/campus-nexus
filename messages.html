@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages — Campus Nexus</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar" id="main-nav"></nav>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="/dashboard.html"><span class="nav-icon">📊</span>Overview</a></li>
+                <li><a href="/projects.html"><span class="nav-icon">🔬</span>Projects</a></li>
+                <li><a href="/applications.html"><span class="nav-icon">📋</span>Applications</a></li>
+                <li><a href="/events.html"><span class="nav-icon">📅</span>Events</a></li>
+                <li><a href="/messages.html" class="active"><span class="nav-icon">💬</span>Messages</a></li>
+                <li><a href="/management.html"><span class="nav-icon">🏗️</span>Management</a></li>
+                <li><a href="/profile.html"><span class="nav-icon">👤</span>Profile</a></li>
+            </ul>
+        </aside>
+        <main class="dashboard-content" style="padding:0; overflow:hidden;">
+            <div style="display:flex; height:100%;">
+                <!-- Convo List Sidebar -->
+                <div style="width:320px; border-right:1px solid var(--border); display:flex; flex-direction:column; background:white;">
+                    <div style="padding:1.5rem; border-bottom:1px solid var(--border);">
+                        <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.25rem;font-weight:800;color:var(--text-dark);">Chat 💬</h2>
+                        <input type="text" id="searchUser" class="form-control" placeholder="🔍 Find someone..." style="margin-top:1rem; font-size:0.85rem;">
+                    </div>
+                    <div id="convoList" style="flex:1; overflow-y:auto; padding:0.5rem;">
+                        <div class="loading-pulse" style="height:60px;margin:0.5rem;"></div>
+                    </div>
+                </div>
+
+                <!-- Chat Area -->
+                <div style="flex:1; display:flex; flex-direction:column; background:var(--bg-main);">
+                    <div id="chatHeader" style="padding:1rem 1.5rem; background:white; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:0.75rem; min-height:64px;">
+                        <span class="text-muted">Select a conversation to start chatting.</span>
+                    </div>
+                    <div id="chatMessages" style="flex:1; overflow-y:auto; padding:1.5rem; display:flex; flex-direction:column;">
+                        <div class="empty-state">
+                            <div class="emoji">💬</div>
+                            <h3>Private messaging</h3>
+                            <p>Collaborate with your teammates directly.</p>
+                        </div>
+                    </div>
+                    <div id="chatInputArea" style="padding:1.25rem; background:white; border-top:1px solid var(--border); display:none;">
+                        <form id="msgForm" style="display:flex; gap:1rem; max-width:900px; margin:0 auto;">
+                            <input type="text" id="msgContent" class="form-control" placeholder="Type your message here..." required autocomplete="off">
+                            <button type="submit" class="btn btn-primary">🚀 Send</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script>
+    let allUsers = [], allMessages = [], activeConvo = null, currentUser = null;
+
+    const renderConvoList = (q = '') => {
+        const c = document.getElementById('convoList');
+        const list = allUsers.filter(u => u.name.toLowerCase().includes(q.toLowerCase()));
+        if (!list.length) { c.innerHTML='<div class="empty-state" style="padding:2rem;">No users found.</div>'; return; }
+        
+        c.innerHTML = list.map(u => `
+            <div class="convo-item ${activeConvo === u.id ? 'active' : ''}" onclick="openConvo(${u.id},'${u.name.replace(/'/g,"\\'")}')" style="cursor:pointer; padding:0.75rem 1rem; border-radius:12px; margin-bottom:0.25rem; display:flex; align-items:center; gap:0.75rem; transition:var(--transition); background:${activeConvo === u.id ? 'var(--primary-bg)' : 'transparent'};">
+                <div style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--accent-teal)); display:flex; align-items:center; justify-content:center; color:white; font-weight:700;">${u.name[0].toUpperCase()}</div>
+                <div style="flex:1; overflow:hidden;">
+                    <div style="font-weight:700; font-size:0.875rem; color:${activeConvo === u.id? 'var(--primary)':'var(--text-dark)'}">${u.name}</div>
+                    <div style="font-size:0.72rem; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${u.department || 'Student'}</div>
+                </div>
+            </div>`).join('');
+    };
+
+    const openConvo = (id, name) => {
+        activeConvo = id;
+        document.getElementById('chatHeader').innerHTML = `
+            <div style="width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--accent-teal)); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:0.9rem;">${name[0].toUpperCase()}</div>
+            <div style="font-weight:700; color:var(--text-dark);">${name}</div>`;
+        document.getElementById('chatInputArea').style.display = 'block';
+        renderConvoList(document.getElementById('searchUser').value);
+        renderMessages();
+    };
+
+    const renderMessages = () => {
+        const c = document.getElementById('chatMessages');
+        if (!activeConvo) return;
+        const myMsgs = allMessages.filter(m => (m.sender_id === activeConvo && m.receiver_id === currentUser.id) || (m.sender_id === currentUser.id && m.receiver_id === activeConvo));
+        if (!myMsgs.length) { c.innerHTML='<div class="empty-state">No messages yet. Say hi! 👋</div>'; return; }
+        
+        c.innerHTML = myMsgs.map(m => {
+            const isSent = m.sender_id === currentUser.id;
+            return `
+            <div class="message-bubble ${isSent ? 'sent' : 'received'} animate-in" style="margin-bottom:1rem;">
+                <div class="bubble-content" style="background:${isSent?'var(--primary)':'white'}; color:${isSent?'white':'var(--text-dark)'}; border:${isSent?'none':'1px solid var(--border)'}; border-radius:18px; padding:0.75rem 1rem; box-shadow:var(--shadow-sm); max-width:80%; font-size:0.875rem; line-height:1.5;">${m.content}</div>
+                <div class="bubble-meta" style="font-size:0.65rem; color:var(--text-muted); margin-top:0.3rem; margin-inline:0.5rem;">${new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+            </div>`;
+        }).join('');
+        c.scrollTop = c.scrollHeight;
+    };
+
+    const loadData = async () => {
+        const [uR, mR] = await Promise.all([fetch('/api/users'), fetch('/api/messages')]);
+        allUsers = await uR.json(); allMessages = await mR.json();
+        renderConvoList();
+        if (activeConvo) renderMessages();
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        currentUser = await checkAuth(); if (!currentUser) return;
+        await loadData();
+        setInterval(loadData, 5000); // Polling for new msgs
+
+        const q = new URLSearchParams(window.location.search).get('to');
+        if (q) {
+            const u = allUsers.find(x => x.id == q);
+            if (u) openConvo(u.id, u.name);
+        }
+
+        document.getElementById('searchUser').addEventListener('input', e => renderConvoList(e.target.value));
+        document.getElementById('msgForm').addEventListener('submit', async e => {
+            e.preventDefault();
+            const inp = document.getElementById('msgContent');
+            if (!inp.value.trim() || !activeConvo) return;
+            const res = await fetch('/api/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ receiver_id: activeConvo, content: inp.value }) });
+            if (res.ok) { inp.value = ''; await loadData(); }
+        });
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects — Campus Nexus</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar" id="main-nav"></nav>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="/dashboard.html"><span class="nav-icon">📊</span>Overview</a></li>
+                <li><a href="/projects.html" class="active"><span class="nav-icon">🔬</span>Projects</a></li>
+                <li><a href="/applications.html"><span class="nav-icon">📋</span>Applications</a></li>
+                <li><a href="/events.html"><span class="nav-icon">📅</span>Events</a></li>
+                <li><a href="/messages.html"><span class="nav-icon">💬</span>Messages</a></li>
+                <li><a href="/management.html"><span class="nav-icon">🏗️</span>Management</a></li>
+                <li><a href="/profile.html"><span class="nav-icon">👤</span>Profile</a></li>
+            </ul>
+        </aside>
+        <main class="dashboard-content">
+            <div class="page-header animate-in">
+                <div class="flex-between">
+                    <div><h2>🔬 Projects</h2><p>Browse open projects or post your own to find teammates.</p></div>
+                    <button class="btn btn-primary" onclick="toggleForm()" id="newBtn">+ New Project</button>
+                </div>
+            </div>
+
+            <!-- Post Form -->
+            <div class="card animate-in" id="postCard" style="display:none; border-left: 4px solid var(--primary);">
+                <div class="section-title mb-3">Post a New Project</div>
+                <form id="postProjectForm">
+                    <div class="grid-cols-2">
+                        <div class="form-group">
+                            <label>Project Title *</label>
+                            <input type="text" id="ptitle" class="form-control" required placeholder="e.g. Campus Event Manager">
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="pcategory" class="form-control">
+                                <option value="Web Dev">🌐 Web Development</option>
+                                <option value="Mobile">📱 Mobile App</option>
+                                <option value="AI/ML">🤖 AI / Machine Learning</option>
+                                <option value="Data Science">📊 Data Science</option>
+                                <option value="IoT">🔌 IoT / Hardware</option>
+                                <option value="Research">📚 Research</option>
+                                <option value="Design">🎨 Design</option>
+                                <option value="General">🔧 General</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description *</label>
+                        <textarea id="pdesc" class="form-control" required placeholder="Describe your project, goals, timeline, and what kind of teammates you're looking for..."></textarea>
+                    </div>
+                    <div class="grid-cols-2">
+                        <div class="form-group">
+                            <label>Required Skills</label>
+                            <input type="text" id="pskills" class="form-control" placeholder="e.g. React, Python, SQL (comma-separated)">
+                        </div>
+                        <div class="form-group">
+                            <label>Team Size Needed</label>
+                            <input type="number" id="pteam" class="form-control" min="1" max="20" value="3" placeholder="3">
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:1rem;align-items:center;">
+                        <button type="submit" class="btn btn-primary" id="postBtn">🚀 Post Project</button>
+                        <button type="button" class="btn btn-ghost" onclick="toggleForm()">Cancel</button>
+                        <span id="postMsg" style="font-size:0.85rem;"></span>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs animate-in animate-delay-1" data-tab-group="projects">
+                <button class="tab-btn active" data-tab="all" onclick="switchTab('projects','all')">All Projects</button>
+                <button class="tab-btn" data-tab="mine" onclick="switchTab('projects','mine')">My Projects</button>
+            </div>
+
+            <!-- Search + Filter -->
+            <div class="flex-between mb-3 flex-wrap gap-2 animate-in animate-delay-1">
+                <input type="text" id="searchIn" class="form-control" placeholder="🔍 Search by title, skill..." style="max-width:260px;">
+                <select id="filterCat" class="form-control" style="max-width:180px;">
+                    <option value="">All Categories</option>
+                    <option>Web Dev</option><option>Mobile</option><option>AI/ML</option>
+                    <option>Data Science</option><option>IoT</option><option>Research</option>
+                    <option>Design</option><option>General</option>
+                </select>
+            </div>
+
+            <!-- All Projects Tab -->
+            <div data-tab-content="projects" data-tab="all" class="tab-panel active" id="allProjectsList">
+                <div class="loading-pulse" style="height:80px;"></div>
+                <div class="loading-pulse" style="height:80px;margin-top:0.75rem;"></div>
+            </div>
+
+            <!-- My Projects Tab -->
+            <div data-tab-content="projects" data-tab="mine" class="tab-panel" id="myProjectsList"></div>
+        </main>
+    </div>
+
+    <!-- Apply Modal -->
+    <div id="applyModal" style="display:none;position:fixed;inset:0;background:rgba(45,42,74,0.4);z-index:999;display:none;align-items:center;justify-content:center;">
+        <div class="card" style="max-width:460px;width:90%;padding:2rem;position:relative;">
+            <h3 style="font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:0.5rem;">Apply to <span id="modalProjectTitle"></span></h3>
+            <p class="text-muted mb-3">Write a short message explaining why you'd be a good fit.</p>
+            <form id="applyForm">
+                <div class="form-group">
+                    <label>Message to Project Owner (optional)</label>
+                    <textarea id="applyMsg" class="form-control" placeholder="Hi! I'd love to join because..." style="min-height:100px;"></textarea>
+                </div>
+                <div style="display:flex;gap:0.75rem;">
+                    <button type="submit" class="btn btn-primary" id="applyBtn">Submit Application</button>
+                    <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+                </div>
+                <span id="applyStatus" style="display:block;margin-top:0.5rem;font-size:0.85rem;"></span>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script>
+    const CATS = { 'Web Dev':'🌐','Mobile':'📱','AI/ML':'🤖','Data Science':'📊','IoT':'🔌','Research':'📚','Design':'🎨','General':'🔧' };
+    const CAT_COLORS = { 'Web Dev':'purple','Mobile':'teal','AI/ML':'rose','Data Science':'amber','IoT':'blue','Research':'teal','Design':'rose','General':'purple' };
+
+    let allProjects = [], currentUser = null, applyProjectId = null;
+
+    function toggleForm() {
+        const c = document.getElementById('postCard'), btn = document.getElementById('newBtn');
+        const show = c.style.display === 'none';
+        c.style.display = show ? 'block' : 'none';
+        btn.textContent = show ? '✕ Close' : '+ New Project';
+    }
+
+    function openModal(id, title) {
+        applyProjectId = id;
+        document.getElementById('modalProjectTitle').textContent = title;
+        document.getElementById('applyMsg').value = '';
+        document.getElementById('applyStatus').textContent = '';
+        const m = document.getElementById('applyModal');
+        m.style.display = 'flex';
+    }
+    function closeModal() { document.getElementById('applyModal').style.display = 'none'; }
+
+    const renderProjects = (projects, containerId, showOwnerActions) => {
+        const c = document.getElementById(containerId);
+        if (!projects.length) { c.innerHTML = `<div class="empty-state"><div class="emoji">🔬</div><h3>No projects found</h3><p>${containerId === 'myProjectsList' ? 'You haven\'t posted any projects yet.' : 'Try a different search or filter.'}</p></div>`; return; }
+        c.innerHTML = projects.map(p => {
+            const skills = (p.skills_required||'').split(',').filter(Boolean).map(s=>`<span class="skill-tag">${s.trim()}</span>`).join('');
+            const cat = CATS[p.category]||'🔧';
+            const isOwner = currentUser && p.owner_id === currentUser.id;
+            return `<div class="project-card">
+                <div class="flex-between mb-1">
+                    <div style="display:flex;gap:0.6rem;align-items:center;">
+                        <span class="badge badge-${CAT_COLORS[p.category]||'purple'}">${cat} ${p.category||'General'}</span>
+                        <span class="badge badge-${p.status==='Open'?'teal':'closed'}">${p.status||'Open'}</span>
+                        ${p.team_size ? `<span style="font-size:0.75rem;color:var(--text-muted);">👥 Team of ${p.team_size}</span>` : ''}
+                    </div>
+                    ${isOwner && showOwnerActions ? `<div style="display:flex;gap:0.5rem;">
+                        <button class="btn btn-soft btn-sm" onclick="toggleStatus(${p.id},'${p.status==='Open'?'Closed':'Open'}')">${p.status==='Open'?'Close':'Reopen'}</button>
+                        <button class="btn btn-soft-rose btn-sm" onclick="deleteProject(${p.id})">🗑 Delete</button>
+                    </div>` : ''}
+                </div>
+                <h4>${p.title}</h4>
+                <p style="font-size:0.85rem;color:var(--text-secondary);margin:0.35rem 0 0.65rem;">${p.description}</p>
+                <div style="margin-bottom:0.6rem;">${skills}</div>
+                <div class="meta">
+                    <span class="owner">👤 ${p.owner_name} &nbsp;·&nbsp; 🕐 ${new Date(p.created_at).toLocaleDateString()}</span>
+                    ${!isOwner && p.status==='Open' ? `<button class="btn btn-primary btn-sm" onclick="openModal(${p.id},'${p.title.replace(/'/g,"\\'")}')">Apply →</button>` : (isOwner ? '<span class="badge badge-purple">Your Project</span>' : '<span class="badge badge-closed">Closed</span>')}
+                </div>
+            </div>`;
+        }).join('');
+    };
+
+    const filterAndRender = () => {
+        const q = document.getElementById('searchIn').value.toLowerCase();
+        const cat = document.getElementById('filterCat').value;
+        const filtered = allProjects.filter(p =>
+            (!q || p.title.toLowerCase().includes(q) || (p.skills_required||'').toLowerCase().includes(q) || (p.owner_name||'').toLowerCase().includes(q)) &&
+            (!cat || p.category === cat)
+        );
+        renderProjects(filtered, 'allProjectsList', false);
+        if (currentUser) {
+            const mine = filtered.filter(p => p.owner_id === currentUser.id);
+            renderProjects(mine, 'myProjectsList', true);
+        }
+    };
+
+    async function toggleStatus(id, newStatus) {
+        await fetch(`/api/projects/${id}/status`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status:newStatus}) });
+        loadProjects();
+    }
+
+    async function deleteProject(id) {
+        if (!confirm('Delete this project? This cannot be undone.')) return;
+        const res = await fetch(`/api/projects/${id}`, { method:'DELETE' });
+        if (res.ok) loadProjects();
+        else alert('Failed to delete');
+    }
+
+    const loadProjects = async () => {
+        const res = await fetch('/api/projects');
+        allProjects = await res.json();
+        filterAndRender();
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        currentUser = await checkAuth();
+        if (!currentUser) return;
+        await loadProjects();
+
+        document.getElementById('searchIn').addEventListener('input', filterAndRender);
+        document.getElementById('filterCat').addEventListener('change', filterAndRender);
+
+        document.getElementById('postProjectForm').addEventListener('submit', async e => {
+            e.preventDefault();
+            const btn = document.getElementById('postBtn');
+            btn.textContent = 'Posting...'; btn.disabled = true;
+            const res = await fetch('/api/projects', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({ title: document.getElementById('ptitle').value, description: document.getElementById('pdesc').value, skills_required: document.getElementById('pskills').value, category: document.getElementById('pcategory').value, team_size: document.getElementById('pteam').value })
+            });
+            if (res.ok) {
+                showMessage('postMsg','✓ Project posted!'); document.getElementById('postProjectForm').reset(); toggleForm(); await loadProjects();
+            } else { showMessage('postMsg','✕ Failed to post', true); }
+            btn.textContent = '🚀 Post Project'; btn.disabled = false;
+        });
+
+        document.getElementById('applyForm').addEventListener('submit', async e => {
+            e.preventDefault();
+            const btn = document.getElementById('applyBtn');
+            btn.textContent = 'Submitting...'; btn.disabled = true;
+            const res = await fetch('/api/applications', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ project_id: applyProjectId, message: document.getElementById('applyMsg').value }) });
+            const data = await res.json();
+            if (res.ok) { document.getElementById('applyStatus').innerHTML = '<span style="color:var(--accent-teal)">✓ Application submitted!</span>'; setTimeout(closeModal, 1500); await loadProjects(); }
+            else { document.getElementById('applyStatus').innerHTML = `<span style="color:var(--accent-rose)">✕ ${data.error}</span>`; btn.textContent = 'Submit Application'; btn.disabled = false; }
+        });
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Nexus — Connect. Collaborate. Create.</title>
+    <meta name="description" content="Campus Nexus — the smart college networking platform for finding teams, collaborating on projects, and joining hackathons.">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar" id="main-nav"></nav>
+
+    <section class="hero">
+        <div class="hero-blob blob1"></div>
+        <div class="hero-blob blob2"></div>
+        <div class="hero-badge">✦ Smart College Networking</div>
+        <h1>Where Great Ideas<br><span class="gradient-text">Find Their Teams</span></h1>
+        <p>Campus Nexus connects students with projects, events, and collaborators. Build real things with real people — right on campus.</p>
+        <div class="hero-buttons">
+            <a href="/register.html" class="btn btn-primary btn-lg">🚀 Get Started Free</a>
+            <a href="/about.html" class="btn btn-outline btn-lg">Learn More</a>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="stats-bar">
+            <div class="stats-bar-item"><div class="num" id="s1">500+</div><div class="label">Active Students</div></div>
+            <div class="stats-bar-item"><div class="num" id="s2">120+</div><div class="label">Projects Posted</div></div>
+            <div class="stats-bar-item"><div class="num" id="s3">40+</div><div class="label">Events & Hackathons</div></div>
+        </div>
+
+        <div style="text-align:center;margin-bottom:2rem;">
+            <p style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);font-weight:700;margin-bottom:0.5rem;">Everything you need</p>
+            <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.8rem;font-weight:800;color:var(--text-dark);">Built for campus collaboration</h2>
+        </div>
+
+        <div class="feature-grid mb-4">
+            <div class="feature-card"><div class="feature-icon purple">🔬</div><h3>Discover Projects</h3><p>Browse academic projects by category and skills. Apply to join teams building cool things.</p></div>
+            <div class="feature-card"><div class="feature-icon teal">📅</div><h3>Join Events</h3><p>Hackathons, workshops, seminars — never miss what's happening on your campus.</p></div>
+            <div class="feature-card"><div class="feature-icon rose">💬</div><h3>Direct Messages</h3><p>Chat directly with any student. No third-party apps needed.</p></div>
+            <div class="feature-card"><div class="feature-icon amber">📋</div><h3>Manage Applications</h3><p>Accept the right people into your team with a simple, clean interface.</p></div>
+            <div class="feature-card"><div class="feature-icon purple">👤</div><h3>Rich Profiles</h3><p>Showcase your skills, GitHub, LinkedIn, department, and year of study.</p></div>
+            <div class="feature-card"><div class="feature-icon teal">🏗️</div><h3>Project Management</h3><p>A dashboard for organizers to track their projects, events, and team activity.</p></div>
+        </div>
+
+        <div class="card text-center" style="padding:3rem 2rem;background:linear-gradient(135deg,#EEE9FF,#E0F7F3);border:none;margin-bottom:3rem;">
+            <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.6rem;font-weight:800;margin-bottom:0.75rem;color:var(--text-dark);">Ready to find your team?</h2>
+            <p class="text-muted mb-3">Join hundreds of students already collaborating on Campus Nexus.</p>
+            <a href="/register.html" class="btn btn-primary btn-lg">Create Your Account →</a>
+        </div>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script>
+        const animateCounter = (el, end, suffix) => {
+            let cur = 0, step = Math.ceil(end/50);
+            const t = setInterval(() => { cur = Math.min(cur+step, end); el.textContent = cur+suffix; if(cur>=end) clearInterval(t); }, 30);
+        };
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                animateCounter(document.getElementById('s1'), 500, '+');
+                animateCounter(document.getElementById('s2'), 120, '+');
+                animateCounter(document.getElementById('s3'), 40, '+');
+            }, 400);
+        });
+    </script>
+</body>
+</html>
