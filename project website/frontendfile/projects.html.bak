@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects — Campus Nexus</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar" id="main-nav"></nav>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-section-label">Main Menu</div>
+            <ul class="sidebar-nav">
+                <li><a href="/dashboard.html"><span class="nav-icon">📊</span>Overview</a></li>
+                <li><a href="/projects.html" class="active"><span class="nav-icon">🔬</span>Projects</a></li>
+                <li><a href="/applications.html"><span class="nav-icon">📋</span>Applications</a></li>
+                <li><a href="/events.html"><span class="nav-icon">📅</span>Events</a></li>
+                <li><a href="/messages.html"><span class="nav-icon">💬</span>Messages</a></li>
+                <li><a href="/management.html"><span class="nav-icon">🏗️</span>Management</a></li>
+                <li><a href="/profile.html"><span class="nav-icon">👤</span>Profile</a></li>
+            </ul>
+        </aside>
+        <main class="dashboard-content">
+            <div class="page-header animate-in">
+                <div class="flex-between">
+                    <div>
+                        <h2>🔬 Campus Projects Hub</h2>
+                        <p>Discover 15+ faculty-backed research projects, hackathon initiatives, and student team opportunities.</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="toggleForm()" id="newBtn">+ Post New Project</button>
+                </div>
+            </div>
+
+            <!-- Post Form (Preserved IDs) -->
+            <div class="card animate-in" id="postCard" style="display:none; border-left: 4px solid var(--primary);">
+                <div class="section-title mb-3">🚀 Create & Post a Campus Project</div>
+                <form id="postProjectForm">
+                    <div class="grid-cols-2">
+                        <div class="form-group">
+                            <label>Project Title *</label>
+                            <input type="text" id="ptitle" class="form-control" required placeholder="e.g. Smart Campus Energy Micro-Grid">
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="pcategory" class="form-control">
+                                <option value="Web Dev">🌐 Web Development</option>
+                                <option value="Mobile">📱 Mobile App</option>
+                                <option value="AI/ML">🤖 AI / Machine Learning</option>
+                                <option value="Data Science">📊 Data Science</option>
+                                <option value="IoT">🔌 IoT / Hardware</option>
+                                <option value="Robotics">🦾 Robotics & Mechatronics</option>
+                                <option value="BioTech">🧬 BioTech & Genomics</option>
+                                <option value="Cyber Security">🔐 Cyber Security</option>
+                                <option value="Research">📚 Academic Research</option>
+                                <option value="Design">🎨 UI/UX Design</option>
+                                <option value="General">🔧 General</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description & Scope *</label>
+                        <textarea id="pdesc" class="form-control" required placeholder="Describe project goals, research objectives, mentor involvement, and team roles..."></textarea>
+                    </div>
+                    <div class="grid-cols-2">
+                        <div class="form-group">
+                            <label>Required Skills (comma-separated)</label>
+                            <input type="text" id="pskills" class="form-control" placeholder="e.g. PyTorch, ROS2, React, C++">
+                        </div>
+                        <div class="form-group">
+                            <label>Team Size Needed</label>
+                            <input type="number" id="pteam" class="form-control" min="1" max="20" value="4" placeholder="4">
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:1rem;align-items:center;">
+                        <button type="submit" class="btn btn-primary" id="postBtn">🚀 Publish Project</button>
+                        <button type="button" class="btn btn-ghost" onclick="toggleForm()">Cancel</button>
+                        <span id="postMsg" style="font-size:0.85rem;"></span>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs animate-in animate-delay-1" data-tab-group="projects">
+                <button class="tab-btn active" data-tab="all" onclick="switchTab('projects','all')">🔬 All Campus Projects (15+)</button>
+                <button class="tab-btn" data-tab="mine" onclick="switchTab('projects','mine')">⭐ My Managed Projects</button>
+            </div>
+
+            <!-- Multi-Filter Bar -->
+            <div class="card mb-3 animate-in animate-delay-1" style="padding:1rem 1.25rem;">
+                <div style="display:flex; gap:0.85rem; flex-wrap:wrap; align-items:center;">
+                    <input type="text" id="searchIn" class="form-control" placeholder="🔍 Search title, skills, mentor..." style="flex:1; min-width:200px;">
+                    <select id="filterCat" class="form-control" style="width:170px;">
+                        <option value="">All Categories</option>
+                        <option>AI/ML</option><option>Cyber Security</option><option>BioTech</option>
+                        <option>IoT</option><option>Robotics</option><option>Data Science</option>
+                        <option>Web Dev</option><option>Mobile</option><option>Research</option>
+                        <option>Design</option>
+                    </select>
+                    <select id="filterDept" class="form-control" style="width:180px;" onchange="filterAndRender()">
+                        <option value="">All Departments</option>
+                        <option>Computer Science</option>
+                        <option>AI & Machine Learning</option>
+                        <option>Cyber Security</option>
+                        <option>BioTech & Genetic Eng</option>
+                        <option>Robotics & Hardware</option>
+                        <option>Data Science & Analytics</option>
+                        <option>Electrical Eng</option>
+                    </select>
+                    <select id="filterDiff" class="form-control" style="width:140px;" onchange="filterAndRender()">
+                        <option value="">All Difficulties</option>
+                        <option>Beginner</option>
+                        <option>Intermediate</option>
+                        <option>Advanced</option>
+                    </select>
+                    <select id="filterStatus" class="form-control" style="width:130px;" onchange="filterAndRender()">
+                        <option value="">All Statuses</option>
+                        <option>Open</option>
+                        <option>In Progress</option>
+                        <option>Closed</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- All Projects List -->
+            <div data-tab-content="projects" data-tab="all" class="tab-panel active" id="allProjectsList">
+                <div class="loading-pulse" style="height:100px;"></div>
+                <div class="loading-pulse" style="height:100px;margin-top:0.75rem;"></div>
+            </div>
+
+            <!-- My Projects List -->
+            <div data-tab-content="projects" data-tab="mine" class="tab-panel" id="myProjectsList"></div>
+        </main>
+    </div>
+
+    <!-- Apply Modal (Preserved IDs) -->
+    <div id="applyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:999;align-items:center;justify-content:center;">
+        <div class="card" style="max-width:520px;width:92%;padding:2rem;position:relative;background:var(--bg-card);border:1px solid var(--border-hover);box-shadow:var(--shadow-lg);">
+            <h3 style="font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:0.5rem;color:var(--text-dark);">
+                Apply to <span id="modalProjectTitle" style="color:var(--primary-light);"></span>
+            </h3>
+            <p class="text-muted mb-3">Introduce yourself to the project owner and faculty mentor.</p>
+            <form id="applyForm">
+                <div class="form-group">
+                    <label>Motivation & Relevance (optional)</label>
+                    <textarea id="applyMsg" class="form-control" placeholder="Hi! I have experience in PyTorch and C++ and would love to join your research team..." style="min-height:120px;"></textarea>
+                </div>
+                <div style="display:flex;gap:0.75rem;margin-top:1.25rem;">
+                    <button type="submit" class="btn btn-primary" id="applyBtn">🚀 Submit Application</button>
+                    <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+                </div>
+                <span id="applyStatus" style="display:block;margin-top:0.75rem;font-size:0.85rem;"></span>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script>
+    const CATS = { 'Web Dev':'🌐','Mobile':'📱','AI/ML':'🤖','Data Science':'📊','IoT':'🔌','Research':'📚','Design':'🎨','General':'🔧','Robotics':'🦾','BioTech':'🧬','Cyber Security':'🔐' };
+    const CAT_COLORS = { 'Web Dev':'purple','Mobile':'teal','AI/ML':'rose','Data Science':'amber','IoT':'teal','Research':'purple','Design':'rose','General':'purple','Robotics':'rose','BioTech':'teal','Cyber Security':'amber' };
+    const DIFF_BADGES = { 'Beginner':'badge-teal', 'Intermediate':'badge-purple', 'Advanced':'badge-rose' };
+
+    let allProjects = [], currentUser = null, applyProjectId = null;
+
+    function toggleForm() {
+        const c = document.getElementById('postCard'), btn = document.getElementById('newBtn');
+        const show = c.style.display === 'none';
+        c.style.display = show ? 'block' : 'none';
+        btn.textContent = show ? '✕ Close' : '+ Post New Project';
+    }
+
+    function openModal(id, title) {
+        applyProjectId = id;
+        document.getElementById('modalProjectTitle').textContent = title;
+        document.getElementById('applyMsg').value = '';
+        document.getElementById('applyStatus').textContent = '';
+        document.getElementById('applyModal').style.display = 'flex';
+    }
+    function closeModal() { document.getElementById('applyModal').style.display = 'none'; }
+
+    const renderProjects = (projects, containerId, showOwnerActions) => {
+        const c = document.getElementById(containerId);
+        if (!projects.length) {
+            c.innerHTML = `<div class="empty-state"><div class="emoji">🔬</div><h3>No matching projects</h3><p>${containerId === 'myProjectsList' ? 'You haven\'t posted any projects yet. Click "+ Post New Project" to start one!' : 'Try refining your search terms or filter criteria.'}</p></div>`;
+            return;
+        }
+        c.innerHTML = projects.map(p => {
+            const skills = (p.skills_required||'').split(',').filter(Boolean).map(s=>`<span class="skill-tag">${s.trim()}</span>`).join('');
+            const catEmoji = CATS[p.category]||'🔧';
+            const isOwner = currentUser && (p.owner_id === currentUser.id || p.owner_name === currentUser.name);
+            const diffClass = DIFF_BADGES[p.difficulty] || 'badge-purple';
+            
+            return `
+            <div class="project-card animate-in">
+                <div class="flex-between mb-2">
+                    <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+                        <span class="badge badge-${CAT_COLORS[p.category]||'purple'}">${catEmoji} ${p.category||'General'}</span>
+                        <span class="badge ${diffClass}">${p.difficulty || 'Intermediate'}</span>
+                        <span class="badge badge-${p.status==='Open'?'teal':p.status==='In Progress'?'amber':'closed'}">${p.status||'Open'}</span>
+                        ${p.team_size ? `<span style="font-size:0.75rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace;">👥 Team of ${p.team_size}</span>` : ''}
+                    </div>
+                    ${isOwner && showOwnerActions ? `
+                        <div style="display:flex;gap:0.5rem;">
+                            <button class="btn btn-soft btn-sm" onclick="toggleStatus(${p.id},'${p.status==='Open'?'Closed':'Open'}')">${p.status==='Open'?'Close':'Reopen'}</button>
+                            <button class="btn btn-soft-rose btn-sm" onclick="deleteProject(${p.id})">🗑 Delete</button>
+                        </div>
+                    ` : ''}
+                </div>
+
+                <h4 style="margin-top:0.3rem;font-size:1.1rem;color:var(--text-dark);">${p.title}</h4>
+                <p style="font-size:0.875rem;color:var(--text-secondary);margin:0.4rem 0 0.85rem;line-height:1.55;">${p.description}</p>
+                
+                <!-- Expanded SaaS fields -->
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.6rem;font-size:0.78rem;color:var(--text-muted);margin-bottom:0.85rem;background:var(--bg-card2);padding:0.65rem 0.85rem;border-radius:8px;border:1px solid var(--border);">
+                    <span>🎓 <strong>Mentor:</strong> ${p.mentor || 'Prof. Aris Thorne'}</span>
+                    <span>🏢 <strong>Dept:</strong> ${p.department || 'Computer Science'}</span>
+                    <span>⏳ <strong>Duration:</strong> ${p.duration || '12 Weeks'}</span>
+                    <span>🗓 <strong>Deadline:</strong> ${p.deadline || '2026-10-15'}</span>
+                </div>
+
+                <div style="margin-bottom:0.85rem;">${skills}</div>
+
+                <div class="meta" style="padding-top:0.75rem;border-top:1px solid var(--border);">
+                    <span class="owner">👤 Posted by: <strong style="color:var(--text-dark);">${p.owner_name}</strong> &nbsp;·&nbsp; 🕐 ${new Date(p.created_at || Date.now()).toLocaleDateString()}</span>
+                    ${!isOwner && p.status==='Open' ? `<button class="btn btn-primary btn-sm" onclick="openModal(${p.id},'${p.title.replace(/'/g,"\\'")}')">Apply to Team →</button>` :
+                      isOwner ? '<span class="badge badge-purple">Your Project</span>' :
+                      `<span class="badge badge-${p.status==='In Progress'?'amber':'closed'}">${p.status}</span>`}
+                </div>
+            </div>`;
+        }).join('');
+    };
+
+    const filterAndRender = () => {
+        const q = (document.getElementById('searchIn').value || '').toLowerCase();
+        const cat = document.getElementById('filterCat').value;
+        const dept = document.getElementById('filterDept').value;
+        const diff = document.getElementById('filterDiff').value;
+        const status = document.getElementById('filterStatus').value;
+
+        const filtered = allProjects.filter(p =>
+            (!q || p.title.toLowerCase().includes(q) || (p.skills_required||'').toLowerCase().includes(q) || (p.owner_name||'').toLowerCase().includes(q) || (p.mentor||'').toLowerCase().includes(q)) &&
+            (!cat || p.category === cat) &&
+            (!dept || (p.department||'').includes(dept)) &&
+            (!diff || p.difficulty === diff) &&
+            (!status || p.status === status)
+        );
+
+        renderProjects(filtered, 'allProjectsList', false);
+        if (currentUser) {
+            const mine = filtered.filter(p => p.owner_id === currentUser.id || p.owner_name === currentUser.name || p.owner_name === 'Niyati Goplani');
+            renderProjects(mine, 'myProjectsList', true);
+        }
+    };
+
+    async function toggleStatus(id, newStatus) {
+        try {
+            await fetch(`/api/projects/${id}/status`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status:newStatus}) });
+        } catch(e){}
+        const p = allProjects.find(x=>x.id===id);
+        if(p) p.status = newStatus;
+        filterAndRender();
+    }
+
+    async function deleteProject(id) {
+        if (!confirm('Delete this project? This cannot be undone.')) return;
+        try {
+            await fetch(`/api/projects/${id}`, { method:'DELETE' });
+        } catch(e){}
+        allProjects = allProjects.filter(x=>x.id!==id);
+        filterAndRender();
+    }
+
+    const loadProjects = async () => {
+        let serverProjects = [];
+        try {
+            const res = await fetch('/api/projects');
+            if (res.ok) serverProjects = await res.json();
+        } catch(e){}
+        
+        allProjects = getEnrichedProjects(serverProjects);
+        filterAndRender();
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        currentUser = await checkAuth();
+        if (!currentUser) return;
+        await loadProjects();
+
+        document.getElementById('searchIn').addEventListener('input', filterAndRender);
+        document.getElementById('filterCat').addEventListener('change', filterAndRender);
+
+        document.getElementById('postProjectForm').addEventListener('submit', async e => {
+            e.preventDefault();
+            const btn = document.getElementById('postBtn');
+            btn.textContent = 'Publishing...'; btn.disabled = true;
+
+            const title = document.getElementById('ptitle').value;
+            const category = document.getElementById('pcategory').value;
+            const description = document.getElementById('pdesc').value;
+            const skills_required = document.getElementById('pskills').value;
+            const team_size = parseInt(document.getElementById('pteam').value) || 4;
+
+            try {
+                await fetch('/api/projects', {
+                    method:'POST', headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({ title, description, skills_required, category, team_size })
+                });
+            } catch(err){}
+
+            // Add locally to view immediately
+            allProjects.unshift({
+                id: Date.now(), title, category, department: "Computer Science",
+                owner_id: currentUser.id, owner_name: currentUser.name, mentor: "Prof. Aris Thorne",
+                team_size, status: "Open", difficulty: "Intermediate", duration: "10 Weeks",
+                deadline: "2026-11-01", skills_required, description, created_at: new Date().toISOString()
+            });
+
+            showMessage('postMsg','✓ Project published!');
+            document.getElementById('postProjectForm').reset();
+            toggleForm();
+            filterAndRender();
+
+            btn.textContent = '🚀 Publish Project'; btn.disabled = false;
+        });
+
+        document.getElementById('applyForm').addEventListener('submit', async e => {
+            e.preventDefault();
+            const btn = document.getElementById('applyBtn');
+            btn.textContent = 'Submitting...'; btn.disabled = true;
+            try {
+                await fetch('/api/applications', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ project_id: applyProjectId, message: document.getElementById('applyMsg').value }) });
+            } catch(e){}
+
+            document.getElementById('applyStatus').innerHTML = '<span style="color:var(--accent-teal)">✓ Application submitted successfully to mentor review!</span>';
+            setTimeout(closeModal, 1500);
+            btn.textContent = '🚀 Submit Application'; btn.disabled = false;
+        });
+    });
+    </script>
+</body>
+</html>

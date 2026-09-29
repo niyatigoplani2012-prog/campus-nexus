@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applications — Campus Nexus</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .timeline { display:flex; gap:0.5rem; align-items:center; margin:0.85rem 0 1rem; }
+        .timeline-step { display:flex; align-items:center; gap:0.35rem; font-size:0.75rem; font-weight:600; font-family:'JetBrains Mono',monospace; }
+        .timeline-dot { width:10px; height:10px; border-radius:50%; border:1px solid var(--border); }
+        .timeline-line { flex:1; height:2px; background:var(--border); max-width:45px; }
+        .step-done .timeline-dot { background:var(--accent-teal); border-color:var(--accent-teal); box-shadow:0 0 6px rgba(6,182,212,0.5); }
+        .step-active .timeline-dot { background:var(--accent-amber); border-color:var(--accent-amber); box-shadow:0 0 6px rgba(245,158,11,0.5); }
+        .step-pending .timeline-dot { background:var(--bg-input); border-color:var(--border); }
+    </style>
+</head>
+<body>
+    <nav class="navbar" id="main-nav"></nav>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-section-label">Main Menu</div>
+            <ul class="sidebar-nav">
+                <li><a href="/dashboard.html"><span class="nav-icon">📊</span>Overview</a></li>
+                <li><a href="/projects.html"><span class="nav-icon">🔬</span>Projects</a></li>
+                <li><a href="/applications.html" class="active"><span class="nav-icon">📋</span>Applications</a></li>
+                <li><a href="/events.html"><span class="nav-icon">📅</span>Events</a></li>
+                <li><a href="/messages.html"><span class="nav-icon">💬</span>Messages</a></li>
+
+                <li><a href="/management.html"><span class="nav-icon">🏗️</span>Management</a></li>
+                <li><a href="/profile.html"><span class="nav-icon">👤</span>Profile</a></li>
+            </ul>
+        </aside>
+
+        <main class="dashboard-content">
+            <div class="page-header animate-in">
+                <h2>📋 Applications & Admissions Tracker</h2>
+                <p>Manage incoming student candidates for your projects and track status for teams you applied to join.</p>
+            </div>
+
+            <!-- Stats Row (Preserved IDs) -->
+            <div class="grid-cols-4 mb-3 animate-in animate-delay-1">
+                <div class="stat-card purple">
+                    <div class="stat-icon">📬</div>
+                    <div class="stat-number" id="rcvTotal">—</div>
+                    <div class="stat-label">Applications Received</div>
+                </div>
+                <div class="stat-card amber">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-number" id="rcvPending">—</div>
+                    <div class="stat-label">Pending Review</div>
+                </div>
+                <div class="stat-card teal">
+                    <div class="stat-icon">📤</div>
+                    <div class="stat-number" id="sentTotal">—</div>
+                    <div class="stat-label">Applications Sent by Me</div>
+                </div>
+                <div class="stat-card rose">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-number" id="sentAccepted">—</div>
+                    <div class="stat-label">Accepted Invitations</div>
+                </div>
+            </div>
+
+            <!-- Tabs (Preserved Group) -->
+            <div class="tabs animate-in animate-delay-2" data-tab-group="apps">
+                <button class="tab-btn active" data-tab="received" onclick="switchTab('apps','received')">📬 Received Applications</button>
+                <button class="tab-btn" data-tab="sent" onclick="switchTab('apps','sent')">📤 Applications Sent by Me</button>
+            </div>
+
+            <!-- Received Tab Panel -->
+            <div data-tab-content="apps" data-tab="received" class="tab-panel active">
+                <div class="card mb-3" style="padding:1rem 1.25rem;">
+                    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;justify-content:space-between;">
+                        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
+                            <button class="btn btn-soft btn-sm active-filter" onclick="applyFilter('received','all',this)">All (7)</button>
+                            <button class="btn btn-ghost btn-sm" onclick="applyFilter('received','Pending',this)">⏳ Pending (3)</button>
+                            <button class="btn btn-ghost btn-sm" onclick="applyFilter('received','Accepted',this)">✅ Accepted (3)</button>
+                            <button class="btn btn-ghost btn-sm" onclick="applyFilter('received','Rejected',this)">❌ Rejected (1)</button>
+                        </div>
+                        <div style="display:flex;gap:0.75rem;align-items:center;">
+                            <input type="text" id="appSearchInput" class="form-control" placeholder="🔍 Search name, roll, project..." style="max-width:240px;font-size:0.82rem;" oninput="renderReceived()">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="receivedList">
+                    <div class="loading-pulse" style="height:100px;"></div>
+                    <div class="loading-pulse" style="height:100px;margin-top:0.75rem;"></div>
+                </div>
+            </div>
+
+            <!-- Sent Tab Panel -->
+            <div data-tab-content="apps" data-tab="sent" class="tab-panel">
+                <div class="card mb-3" style="padding:1rem 1.25rem;">
+                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
+                        <button class="btn btn-soft btn-sm active-filter" onclick="applyFilter('sent','all',this)">All Applications</button>
+                        <button class="btn btn-ghost btn-sm" onclick="applyFilter('sent','Pending',this)">⏳ Pending</button>
+                        <button class="btn btn-ghost btn-sm" onclick="applyFilter('sent','Accepted',this)">✅ Accepted</button>
+                        <button class="btn btn-ghost btn-sm" onclick="applyFilter('sent','Rejected',this)">❌ Rejected</button>
+                    </div>
+                </div>
+
+                <div id="sentList">
+                    <div class="loading-pulse" style="height:80px;"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Resume View Modal -->
+    <div id="resumeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:999;align-items:center;justify-content:center;">
+        <div class="card" style="max-width:560px;width:92%;padding:2rem;position:relative;background:var(--bg-card);border:1px solid var(--border-hover);box-shadow:var(--shadow-lg);">
+            <div class="flex-between mb-3">
+                <h3 style="font-family:'Plus Jakarta Sans',sans-serif;color:var(--text-dark);" id="resumeModalTitle">📄 Applicant Resume Profile</h3>
+                <button class="btn btn-ghost btn-sm" onclick="closeResumeModal()">✕</button>
+            </div>
+            <div id="resumeModalContent">
+                <!-- Filled dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script>
+    let rcvApps = [], sentApps = [];
+    let rcvFilter = 'all', sentFilter = 'all';
+
+    function applyFilter(type, val, btn) {
+        const container = type === 'received' ? 'receivedList' : 'sentList';
+        const tabParent = document.querySelector(`[data-tab-content="apps"][data-tab="${type}"]`);
+        if (tabParent) {
+            tabParent.querySelectorAll('.btn-soft, .btn-ghost').forEach(b => {
+                b.className = 'btn btn-ghost btn-sm';
+            });
+        }
+        btn.className = 'btn btn-soft btn-sm active-filter';
+        if (type === 'received') { rcvFilter = val; renderReceived(); }
+        else { sentFilter = val; renderSent(); }
+    }
+
+    const statusBadge = s => {
+        const map = { Pending:'badge-pending', Accepted:'badge-accepted', Rejected:'badge-rejected' };
+        const ic = { Pending:'⏳', Accepted:'✅', Rejected:'❌' };
+        return `<span class="badge ${map[s]||'badge-pending'}">${ic[s]||''} ${s}</span>`;
+    };
+
+    const timeline = status => {
+        const steps = ['Applied','Screening','Faculty Review','Decision'];
+        const idx = status==='Pending'?1:status==='Accepted'||status==='Rejected'?3:2;
+        return `<div class="timeline">${steps.map((s,i)=>`
+            <div class="timeline-step ${i<idx?'step-done':i===idx?'step-active':'step-pending'}">
+                <div class="timeline-dot"></div>
+                <span style="color:${i<=idx?'var(--text-secondary)':'var(--text-muted)'}">${s}</span>
+            </div>${i<steps.length-1?'<div class="timeline-line"></div>':''}
+        `).join('')}</div>`;
+    };
+
+    function openResume(name, roll, dept, skills, motivation, resumeFile) {
+        document.getElementById('resumeModalTitle').textContent = `📄 Candidate Dossier — ${name}`;
+        document.getElementById('resumeModalContent').innerHTML = `
+            <div style="background:var(--bg-card2);padding:1.25rem;border-radius:10px;border:1px solid var(--border);margin-bottom:1rem;">
+                <div style="font-weight:700;font-size:1.1rem;color:var(--text-dark);">${name}</div>
+                <div style="font-size:0.82rem;color:var(--text-muted);margin-top:0.25rem;">
+                    🎓 <strong>Roll No:</strong> ${roll || '24CS0192'} &nbsp;·&nbsp; 🏢 <strong>Dept:</strong> ${dept || 'Computer Science'}
+                </div>
+            </div>
+            <div class="mb-3">
+                <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);font-weight:700;margin-bottom:0.4rem;">Core Technical Skills</div>
+                <div>${(skills||'').split(',').map(s=>`<span class="skill-tag">${s.trim()}</span>`).join('')}</div>
+            </div>
+            <div class="mb-3">
+                <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);font-weight:700;margin-bottom:0.4rem;">Statement of Motivation</div>
+                <div style="font-size:0.88rem;color:var(--text-secondary);background:var(--bg-input);padding:0.85rem;border-radius:8px;border:1px solid var(--border);line-height:1.6;">
+                    "${motivation || 'Eager to contribute to high-impact campus research projects.'}"
+                </div>
+            </div>
+            <div class="flex-between">
+                <span style="font-size:0.8rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace;">📎 Document: ${resumeFile || 'Student_Dossier.pdf'}</span>
+                <button class="btn btn-soft btn-sm" onclick="alert('Downloading candidate resume PDF dockets...')">⬇ Download Dossier PDF</button>
+            </div>
+        `;
+        document.getElementById('resumeModal').style.display = 'flex';
+    }
+    function closeResumeModal() { document.getElementById('resumeModal').style.display = 'none'; }
+
+    const renderReceived = () => {
+        const c = document.getElementById('receivedList');
+        const searchQ = (document.getElementById('appSearchInput')?.value || '').toLowerCase();
+        
+        let list = rcvFilter==='all' ? rcvApps : rcvApps.filter(a=>a.status===rcvFilter);
+        if (searchQ) {
+            list = list.filter(a =>
+                a.applicant_name.toLowerCase().includes(searchQ) ||
+                (a.roll||'').toLowerCase().includes(searchQ) ||
+                a.project_title.toLowerCase().includes(searchQ) ||
+                (a.applicant_skills||'').toLowerCase().includes(searchQ)
+            );
+        }
+
+        if (!list.length) {
+            c.innerHTML=`<div class="empty-state"><div class="emoji">📬</div><h3>No applications found</h3><p>No applications match the active filter or search term.</p></div>`;
+            return;
+        }
+
+        c.innerHTML = list.map(a => `
+            <div class="card animate-in" style="border-left:4px solid ${a.status==='Accepted'?'var(--accent-teal)':a.status==='Rejected'?'var(--accent-rose)':'var(--accent-amber)'}">
+                <div class="flex-between mb-2">
+                    <div style="display:flex;gap:0.85rem;align-items:center;">
+                        <div style="width:44px;height:44px;background:linear-gradient(135deg,var(--primary),var(--accent-teal));border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:1.15rem;box-shadow:var(--shadow-sm);">${a.applicant_name[0].toUpperCase()}</div>
+                        <div>
+                            <div style="font-weight:700;color:var(--text-dark);font-size:1rem;">
+                                ${a.applicant_name} <span style="font-size:0.75rem;color:var(--text-muted);font-weight:500;font-family:'JetBrains Mono',monospace;">(${a.roll || '24CS0192'})</span>
+                            </div>
+                            <div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.15rem;">
+                                Applied for: <strong style="color:var(--primary-light);">${a.project_title}</strong> &nbsp;·&nbsp; 🏢 ${a.department || 'Computer Science'}
+                            </div>
+                        </div>
+                    </div>
+                    ${statusBadge(a.status)}
+                </div>
+
+                ${a.applicant_skills ? `<div style="margin-bottom:0.6rem;">${a.applicant_skills.split(',').map(s=>`<span class="skill-tag">${s.trim()}</span>`).join('')}</div>` : ''}
+                
+                ${a.message ? `<div class="card-flat" style="margin-bottom:0.85rem;font-size:0.875rem;color:var(--text-secondary);background:var(--bg-input);">💬 Note: "<em>${a.message}</em>"</div>` : ''}
+
+                ${timeline(a.status)}
+
+                <div style="display:flex;gap:0.65rem;flex-wrap:wrap;align-items:center;margin-top:0.85rem;padding-top:0.75rem;border-top:1px solid var(--border);">
+                    ${a.status==='Pending' ? `
+                        <button class="btn btn-success btn-sm" onclick="updateApp(${a.id},'Accepted')">✓ Accept Candidate</button>
+                        <button class="btn btn-rose btn-sm" onclick="updateApp(${a.id},'Rejected')">✕ Reject Application</button>
+                    ` : ''}
+                    <button class="btn btn-soft btn-sm" onclick="openResume('${a.applicant_name.replace(/'/g,"\\'")}','${a.roll||'24CS0192'}','${a.department||'CS'}','${(a.applicant_skills||'').replace(/'/g,"\\'")}','${(a.motivation||a.message||'').replace(/'/g,"\\'")}','${a.resume||'Dossier.pdf'}')">📄 View Resume Dossier</button>
+                    <a href="/messages.html?to=${a.applicant_id}" class="btn btn-ghost btn-sm">💬 Chat with Candidate</a>
+                    <span style="margin-left:auto;font-size:0.75rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace;">🎓 Mentor: ${a.mentor || 'Dr. Vikram Samant'}</span>
+                </div>
+            </div>`).join('');
+    };
+
+    const renderSent = () => {
+        const c = document.getElementById('sentList');
+        const list = sentFilter==='all' ? sentApps : sentApps.filter(a=>a.status===sentFilter);
+        
+        if (!list.length) {
+            c.innerHTML=`<div class="empty-state"><div class="emoji">📤</div><h3>No applications sent</h3><p>You haven't submitted any applications matching this status.</p><a href="/projects.html" class="btn btn-primary btn-sm" style="margin-top:1rem;">Browse Open Projects</a></div>`;
+            return;
+        }
+
+        c.innerHTML = list.map(a=>`
+            <div class="card animate-in" style="border-left:4px solid ${a.status==='Accepted'?'var(--accent-teal)':a.status==='Rejected'?'var(--accent-rose)':'var(--accent-amber)'}">
+                <div class="flex-between mb-2">
+                    <div>
+                        <h4 style="font-weight:700;color:var(--text-dark);font-size:1.05rem;">${a.project_title}</h4>
+                        <span style="font-size:0.8rem;color:var(--text-muted);">Lead Mentor: <strong>${a.owner_name || 'Prof. Aris Thorne'}</strong> &nbsp;·&nbsp; ${a.category||'General'} &nbsp;·&nbsp; Submitted ${new Date(a.created_at || Date.now()).toLocaleDateString()}</span>
+                    </div>
+                    ${statusBadge(a.status)}
+                </div>
+
+                ${a.message ? `<div class="card-flat" style="margin-bottom:0.85rem;font-size:0.875rem;color:var(--text-secondary);background:var(--bg-input);">Your submission note: "<em>${a.message}</em>"</div>` : ''}
+                
+                ${timeline(a.status)}
+
+                ${a.status==='Accepted' ? `<div class="info-box" style="margin-top:0.75rem;">🎉 Congratulations Niyati! Your application was accepted. <a href="/messages.html" style="color:var(--primary-light);margin-left:0.5rem;font-weight:600;">Open Team Chat Workspace →</a></div>` : ''}
+            </div>`).join('');
+    };
+
+    async function updateApp(id, status) {
+        try {
+            await fetch(`/api/applications/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status}) });
+        } catch(e){}
+
+        const item = rcvApps.find(x => x.id === id);
+        if (item) item.status = status;
+        
+        document.getElementById('rcvPending').textContent = rcvApps.filter(a=>a.status==='Pending').length;
+        renderReceived();
+    }
+
+    const loadAll = async () => {
+        let serverReceived = [], serverSent = [];
+        try {
+            const [r1, r2] = await Promise.all([
+                fetch('/api/applications/received').catch(() => null),
+                fetch('/api/applications/sent').catch(() => null)
+            ]);
+            if (r1 && r1.ok) serverReceived = await r1.json();
+            if (r2 && r2.ok) serverSent = await r2.json();
+        } catch(e){}
+
+        const enriched = getEnrichedApplications(serverReceived, serverSent);
+        rcvApps = enriched.received;
+        sentApps = enriched.sent;
+
+        document.getElementById('rcvTotal').textContent = rcvApps.length;
+        document.getElementById('rcvPending').textContent = rcvApps.filter(a=>a.status==='Pending').length;
+        document.getElementById('sentTotal').textContent = sentApps.length;
+        document.getElementById('sentAccepted').textContent = sentApps.filter(a=>a.status==='Accepted').length;
+
+        renderReceived();
+        renderSent();
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        if (!await checkAuth()) return;
+        await loadAll();
+    });
+    </script>
+</body>
+</html>

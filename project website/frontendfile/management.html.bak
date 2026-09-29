@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Management — Campus Nexus</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar" id="main-nav"></nav>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-section-label">Main Menu</div>
+            <ul class="sidebar-nav">
+                <li><a href="/dashboard.html"><span class="nav-icon">📊</span>Overview</a></li>
+                <li><a href="/projects.html"><span class="nav-icon">🔬</span>Projects</a></li>
+                <li><a href="/applications.html"><span class="nav-icon">📋</span>Applications</a></li>
+                <li><a href="/events.html"><span class="nav-icon">📅</span>Events</a></li>
+                <li><a href="/messages.html"><span class="nav-icon">💬</span>Messages</a></li>
+                <li><a href="/management.html" class="active"><span class="nav-icon">🏗️</span>Management</a></li>
+                <li><a href="/profile.html"><span class="nav-icon">👤</span>Profile</a></li>
+            </ul>
+        </aside>
+
+        <main class="dashboard-content">
+            <div class="page-header animate-in">
+                <div class="flex-between">
+                    <div>
+                        <h2>🏗️ Project Management Workspace</h2>
+                        <p>Track sprints, manage team members, assign tasks, and monitor research hardware resources.</p>
+                    </div>
+                    <div style="display:flex;gap:0.75rem;align-items:center;">
+                        <select id="managedProjectsSelect" class="form-control" style="max-width:280px;" onchange="switchProject()">
+                            <option value="104">🔌 Smart Campus IoT Energy Micro-Grid</option>
+                            <option value="101">🤖 Autonomous Swarm Drone Navigation</option>
+                            <option value="102">🔐 Quantum-Resistant Cryptographic Vault</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="openTaskModal()">+ Add Task</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Progress Overview Bar -->
+            <div class="card animate-in mb-3" style="background:var(--bg-card);border:1px solid var(--border-hover);">
+                <div class="flex-between mb-2">
+                    <div>
+                        <div class="badge badge-teal mb-1">Active Sprint 4 — Delivery Target Oct 2026</div>
+                        <h3 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.2rem;color:var(--text-dark);" id="projectHeaderTitle">
+                            🔌 Smart Campus IoT Energy Micro-Grid
+                        </h3>
+                        <div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.25rem;">
+                            Faculty Lead: <strong style="color:var(--text-secondary);">Dr. Vikram Samant</strong> &nbsp;·&nbsp; Department: Computer Science & Hardware
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:1.5rem;font-weight:800;color:var(--accent-teal);font-family:'Plus Jakarta Sans';">68%</div>
+                        <div style="font-size:0.75rem;color:var(--text-muted);">Overall Sprint Completion</div>
+                    </div>
+                </div>
+                <div class="progress-bar-wrap mb-2"><div class="progress-bar-fill progress-teal" style="width:68%;"></div></div>
+            </div>
+
+            <!-- Main Kanban Board -->
+            <div class="section-title mb-2">📋 Team Sprint Kanban Board</div>
+            <div class="kanban-board mb-4" id="kanbanBoard">
+                <!-- Column 1: To Do -->
+                <div class="kanban-col">
+                    <div class="kanban-col-head">
+                        <span>⏳ TO DO</span>
+                        <span class="badge badge-amber" id="todoCount">1</span>
+                    </div>
+                    <div id="todoList">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+
+                <!-- Column 2: In Progress -->
+                <div class="kanban-col">
+                    <div class="kanban-col-head">
+                        <span>⚡ IN PROGRESS</span>
+                        <span class="badge badge-purple" id="inprogCount">3</span>
+                    </div>
+                    <div id="inprogList">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+
+                <!-- Column 3: Done -->
+                <div class="kanban-col">
+                    <div class="kanban-col-head">
+                        <span>✅ DONE</span>
+                        <span class="badge badge-teal" id="doneCount">2</span>
+                    </div>
+                    <div id="doneList">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team & Resource Split -->
+            <div class="grid-cols-2 animate-in animate-delay-1">
+                <!-- Team Roster -->
+                <div class="card">
+                    <div class="section-title mb-3">👥 Active Project Team Roster</div>
+                    <div id="teamRosterList" style="display:flex;flex-direction:column;gap:0.75rem;">
+                        <div style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem;background:var(--bg-card2);border-radius:8px;border:1px solid var(--border);">
+                            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent-teal));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.82rem;">AS</div>
+                            <div style="flex:1;">
+                                <div style="font-weight:700;font-size:0.88rem;color:var(--text-dark);">Niyati Goplani <span class="badge badge-purple" style="font-size:0.65rem;">Team Lead</span></div>
+                                <div style="font-size:0.75rem;color:var(--text-muted);">Roll 24CS0192 · CS Dept · ESP32 Sensor Hardware</div>
+                            </div>
+                            <a href="/messages.html?to=1" class="btn btn-ghost btn-sm">💬</a>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem;background:var(--bg-card2);border-radius:8px;border:1px solid var(--border);">
+                            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent-teal));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.82rem;">RM</div>
+                            <div style="flex:1;">
+                                <div style="font-weight:700;font-size:0.88rem;color:var(--text-dark);">Rohan Mehta</div>
+                                <div style="font-size:0.75rem;color:var(--text-muted);">Roll 23AI0841 · AI Dept · Solar Neural Forecast Models</div>
+                            </div>
+                            <a href="/messages.html?to=2" class="btn btn-ghost btn-sm">💬</a>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem;background:var(--bg-card2);border-radius:8px;border:1px solid var(--border);">
+                            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent-teal));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.82rem;">MV</div>
+                            <div style="flex:1;">
+                                <div style="font-weight:700;font-size:0.88rem;color:var(--text-dark);">Marcus Vance</div>
+                                <div style="font-size:0.75rem;color:var(--text-muted);">Roll 24DS0112 · Data Science · React Telemetry Dashboard</div>
+                            </div>
+                            <a href="/messages.html?to=4" class="btn btn-ghost btn-sm">💬</a>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem;background:var(--bg-card2);border-radius:8px;border:1px solid var(--border);">
+                            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent-teal));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.82rem;">PP</div>
+                            <div style="flex:1;">
+                                <div style="font-weight:700;font-size:0.88rem;color:var(--text-dark);">Priya Patel</div>
+                                <div style="font-size:0.75rem;color:var(--text-muted);">Roll 22CY0415 · Cyber Security · TLS Firmware Auditor</div>
+                            </div>
+                            <a href="/messages.html?to=3" class="btn btn-ghost btn-sm">💬</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hardware & Resource Inventory -->
+                <div class="card">
+                    <div class="section-title mb-3">🛠️ Hardware Allocation & Lab Inventory</div>
+                    <div id="resourceList" style="display:flex;flex-direction:column;gap:0.75rem;">
+                        <div class="card-flat" style="padding:0.85rem 1rem;margin-bottom:0;">
+                            <div class="flex-between">
+                                <span style="font-weight:700;font-size:0.88rem;color:var(--text-dark);">🔌 4x ESP32 NodeMCU Microcontrollers</span>
+                                <span class="badge badge-teal">Deployed</span>
+                            </div>
+                            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.2rem;">Location: Engineering Hall Building B Roof Array</div>
+                        </div>
+                        <div class="card-flat" style="padding:0.85rem 1rem;margin-bottom:0;">
+                            <div class="flex-between">
+                                <span style="font-weight:700;font-size:0.88rem;color:var(--text-dark);">⚡ 2x INA219 Power/Current Sensor Modules</span>
+                                <span class="badge badge-teal">Operational</span>
+                            </div>
+                            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.2rem;">Telemetry: Sampling rate 100ms via MQTT</div>
+                        </div>
+                        <div class="card-flat" style="padding:0.85rem 1rem;margin-bottom:0;">
+                            <div class="flex-between">
+                                <span style="font-weight:700;font-size:0.88rem;color:var(--text-dark);">🧠 1x NVIDIA Jetson Orin Nano (8GB)</span>
+                                <span class="badge badge-purple">Assigned: Rohan</span>
+                            </div>
+                            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.2rem;">Edge inference execution for solar load prediction</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div id="taskModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:999;align-items:center;justify-content:center;">
+        <div class="card" style="max-width:500px;width:92%;padding:2rem;position:relative;background:var(--bg-card);border:1px solid var(--border-hover);box-shadow:var(--shadow-lg);">
+            <h3 style="font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:1rem;color:var(--text-dark);">+ Add Sprint Kanban Task</h3>
+            <form id="taskForm">
+                <div class="form-group">
+                    <label>Task Title *</label>
+                    <input type="text" id="taskTitle" class="form-control" required placeholder="e.g. Conduct TLS Firmware Security Audit">
+                </div>
+                <div class="grid-cols-2">
+                    <div class="form-group">
+                        <label>Assignee</label>
+                        <select id="taskAssignee" class="form-control">
+                            <option>Niyati Goplani</option>
+                            <option>Rohan Mehta</option>
+                            <option>Marcus Vance</option>
+                            <option>Priya Patel</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <select id="taskPriority" class="form-control">
+                            <option>High</option>
+                            <option>Medium</option>
+                            <option>Low</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display:flex;gap:0.75rem;margin-top:1.25rem;">
+                    <button type="submit" class="btn btn-primary">🚀 Create Task</button>
+                    <button type="button" class="btn btn-ghost" onclick="closeTaskModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script>
+    let localTasks = [
+        { id: 501, title: "Deploy ESP32 MQTT Sensor Firmware", assignee: "Niyati Goplani", status: "Done", priority: "High", due: "2026-08-10" },
+        { id: 502, title: "Train Solar Peak Neural Forecast Model", assignee: "Rohan Mehta", status: "In Progress", priority: "High", due: "2026-08-14" },
+        { id: 503, title: "Build React Telemetry Analytics Dashboard", assignee: "Marcus Vance", status: "In Progress", priority: "Medium", due: "2026-08-18" },
+        { id: 504, title: "Conduct TLS Firmware Security Audit", assignee: "Priya Patel", status: "To Do", priority: "High", due: "2026-08-22" },
+        { id: 505, title: "Swarm ROS2 Gazebo Physics Simulation", assignee: "Rohan Mehta", status: "Done", priority: "High", due: "2026-08-12" },
+        { id: 506, title: "CRYSTALS-Kyber Lattice Key Exchange Test", assignee: "Priya Patel", status: "In Progress", priority: "High", due: "2026-08-25" }
+    ];
+
+    function openTaskModal() { document.getElementById('taskModal').style.display = 'flex'; }
+    function closeTaskModal() { document.getElementById('taskModal').style.display = 'none'; }
+
+    function switchProject() {
+        const val = document.getElementById('managedProjectsSelect').value;
+        const titles = { '104':'🔌 Smart Campus IoT Energy Micro-Grid', '101':'🤖 Autonomous Swarm Drone Navigation', '102':'🔐 Quantum-Resistant Cryptographic Vault' };
+        document.getElementById('projectHeaderTitle').textContent = titles[val] || titles['104'];
+        renderKanban();
+    }
+
+    function moveTask(id, nextStatus) {
+        const t = localTasks.find(x => x.id === id);
+        if (t) t.status = nextStatus;
+        renderKanban();
+    }
+
+    function renderKanban() {
+        const todo = localTasks.filter(t => t.status === 'To Do');
+        const inprog = localTasks.filter(t => t.status === 'In Progress');
+        const done = localTasks.filter(t => t.status === 'Done');
+
+        document.getElementById('todoCount').textContent = todo.length;
+        document.getElementById('inprogCount').textContent = inprog.length;
+        document.getElementById('doneCount').textContent = done.length;
+
+        const cardHTML = (t, leftSt, rightSt) => `
+            <div class="kanban-card">
+                <div class="flex-between mb-1">
+                    <span class="badge badge-${t.priority==='High'?'rose':t.priority==='Medium'?'amber':'teal'}">${t.priority} Priority</span>
+                    <span style="font-size:0.72rem;color:var(--text-muted);font-family:'JetBrains Mono';">🗓 ${t.due}</span>
+                </div>
+                <div style="font-weight:700;font-size:0.88rem;color:var(--text-dark);margin:0.35rem 0;">${t.title}</div>
+                <div class="flex-between" style="margin-top:0.75rem;padding-top:0.5rem;border-top:1px solid var(--border);">
+                    <span style="font-size:0.75rem;color:var(--primary-light);font-weight:600;">👤 ${t.assignee}</span>
+                    <div style="display:flex;gap:0.3rem;">
+                        ${leftSt ? `<button class="btn btn-ghost btn-sm" style="padding:0.1rem 0.4rem;font-size:0.7rem;" onclick="moveTask(${t.id},'${leftSt}')">←</button>` : ''}
+                        ${rightSt ? `<button class="btn btn-ghost btn-sm" style="padding:0.1rem 0.4rem;font-size:0.7rem;" onclick="moveTask(${t.id},'${rightSt}')">→</button>` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('todoList').innerHTML = todo.length ? todo.map(t => cardHTML(t, null, 'In Progress')).join('') : `<div style="font-size:0.8rem;color:var(--text-muted);text-align:center;padding:1.5rem 0;">No pending tasks</div>`;
+        document.getElementById('inprogList').innerHTML = inprog.length ? inprog.map(t => cardHTML(t, 'To Do', 'Done')).join('') : `<div style="font-size:0.8rem;color:var(--text-muted);text-align:center;padding:1.5rem 0;">No active tasks</div>`;
+        document.getElementById('doneList').innerHTML = done.length ? done.map(t => cardHTML(t, 'In Progress', null)).join('') : `<div style="font-size:0.8rem;color:var(--text-muted);text-align:center;padding:1.5rem 0;">No finished tasks</div>`;
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        if (!await checkAuth()) return;
+        renderKanban();
+
+        document.getElementById('taskForm').addEventListener('submit', e => {
+            e.preventDefault();
+            const title = document.getElementById('taskTitle').value;
+            const assignee = document.getElementById('taskAssignee').value;
+            const priority = document.getElementById('taskPriority').value;
+
+            localTasks.unshift({
+                id: Date.now(), title, assignee, status: 'To Do', priority, due: '2026-09-01'
+            });
+
+            closeTaskModal();
+            document.getElementById('taskForm').reset();
+            renderKanban();
+        });
+    });
+    </script>
+</body>
+</html>

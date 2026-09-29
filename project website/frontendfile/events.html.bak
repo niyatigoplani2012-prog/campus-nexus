@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events — Campus Nexus</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .event-banner { height:110px; border-radius:12px 12px 0 0; padding:1.25rem; display:flex; justify-content:space-between; align-items:flex-start; position:relative; overflow:hidden; }
+        .event-banner::after { content:''; position:absolute; inset:0; background:linear-gradient(to bottom, transparent 20%, rgba(20,23,36,0.95) 100%); }
+        .banner-title { position:relative; z-index:1; font-family:'Plus Jakarta Sans',sans-serif; font-weight:800; font-size:1.15rem; color:white; }
+        .banner-badge { position:relative; z-index:1; }
+        .countdown-box { display:flex; gap:0.4rem; background:rgba(0,0,0,0.4); backdrop-filter:blur(8px); padding:0.35rem 0.65rem; border-radius:8px; border:1px solid rgba(255,255,255,0.15); font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:var(--accent-teal); }
+        .countdown-item { display:flex; flex-direction:column; align-items:center; }
+        .countdown-val { font-weight:700; line-height:1; }
+        .countdown-lbl { font-size:0.58rem; color:var(--text-muted); text-transform:uppercase; margin-top:0.1rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar" id="main-nav"></nav>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-section-label">Main Menu</div>
+            <ul class="sidebar-nav">
+                <li><a href="/dashboard.html"><span class="nav-icon">📊</span>Overview</a></li>
+                <li><a href="/projects.html"><span class="nav-icon">🔬</span>Projects</a></li>
+                <li><a href="/applications.html"><span class="nav-icon">📋</span>Applications</a></li>
+                <li><a href="/events.html" class="active"><span class="nav-icon">📅</span>Events</a></li>
+                <li><a href="/messages.html"><span class="nav-icon">💬</span>Messages</a></li>
+                <li><a href="/management.html"><span class="nav-icon">🏗️</span>Management</a></li>
+                <li><a href="/profile.html"><span class="nav-icon">👤</span>Profile</a></li>
+            </ul>
+        </aside>
+
+        <main class="dashboard-content">
+            <div class="page-header animate-in">
+                <div class="flex-between">
+                    <div>
+                        <h2>📅 Campus Events & Hackathons</h2>
+                        <p>Explore 10+ upcoming university hackathons, guest keynotes, technical bootcamps, and competitions.</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="toggleForm()" id="newEventBtn">+ Post New Event</button>
+                </div>
+            </div>
+
+            <!-- Post Event Form (Preserved IDs) -->
+            <div class="card animate-in" id="postEventCard" style="display:none; border-left:4px solid var(--accent-teal);">
+                <div class="section-title mb-3">📢 Host a New Campus Event</div>
+                <form id="postEventForm">
+                    <div class="grid-cols-2">
+                        <div class="form-group">
+                            <label>Event Title *</label>
+                            <input type="text" id="etitle" class="form-control" required placeholder="e.g. NexusHack 2026: AI & Clean Energy">
+                        </div>
+                        <div class="form-group">
+                            <label>Event Category</label>
+                            <select id="etype" class="form-control">
+                                <option value="Hackathon">🏆 Hackathon</option>
+                                <option value="Workshop">💻 Workshop / Lab</option>
+                                <option value="Seminar">🎤 Keynote Seminar</option>
+                                <option value="Competition">⚔️ Competition</option>
+                                <option value="Meetup">🤝 Networking Meetup</option>
+                                <option value="General">📅 General Campus Event</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid-cols-3">
+                        <div class="form-group">
+                            <label>Date *</label>
+                            <input type="date" id="edate" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Start Time</label>
+                            <input type="text" id="etime" class="form-control" placeholder="10:00 AM">
+                        </div>
+                        <div class="form-group">
+                            <label>Seat Capacity</label>
+                            <input type="number" id="ecap" class="form-control" min="10" max="1000" value="150">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Venue / Location *</label>
+                        <input type="text" id="eloc" class="form-control" required placeholder="e.g. Innovation Hub Main Auditorium Room 101">
+                    </div>
+                    <div class="form-group">
+                        <label>Description & Agenda *</label>
+                        <textarea id="edesc" class="form-control" required placeholder="Outline event schedule, speaker bio, prize pools, and requirements..."></textarea>
+                    </div>
+                    <div style="display:flex;gap:1rem;align-items:center;">
+                        <button type="submit" class="btn btn-teal" id="postEventBtn">📅 Publish Event</button>
+                        <button type="button" class="btn btn-ghost" onclick="toggleForm()">Cancel</button>
+                        <span id="postEventMsg" style="font-size:0.85rem;"></span>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs animate-in animate-delay-1" data-tab-group="events">
+                <button class="tab-btn active" data-tab="all" onclick="switchTab('events','all')">📅 All Campus Events (10+)</button>
+                <button class="tab-btn" data-tab="registered" onclick="switchTab('events','registered')">🎟️ Registered RSVP (3)</button>
+                <button class="tab-btn" data-tab="mine" onclick="switchTab('events','mine')">⭐ Events I Organize</button>
+            </div>
+
+            <!-- Search & Filter Bar -->
+            <div class="card mb-3 animate-in animate-delay-1" style="padding:1rem 1.25rem;">
+                <div style="display:flex;gap:0.85rem;flex-wrap:wrap;align-items:center;">
+                    <input type="text" id="searchEventIn" class="form-control" placeholder="🔍 Search event title, location, organizer..." style="flex:1;min-width:200px;" oninput="filterEvents()">
+                    <select id="filterType" class="form-control" style="width:160px;" onchange="filterEvents()">
+                        <option value="">All Event Types</option>
+                        <option>Hackathon</option>
+                        <option>Workshop</option>
+                        <option>Seminar</option>
+                        <option>Competition</option>
+                        <option>Meetup</option>
+                    </select>
+                    <select id="filterMonth" class="form-control" style="width:160px;" onchange="filterEvents()">
+                        <option value="">All Months</option>
+                        <option value="2026-09">September 2026</option>
+                        <option value="2026-10">October 2026</option>
+                        <option value="2026-11">November 2026</option>
+                        <option value="2026-12">December 2026</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- All Events List -->
+            <div data-tab-content="events" data-tab="all" class="tab-panel active" id="allEventsList">
+                <div class="loading-pulse" style="height:120px;"></div>
+                <div class="loading-pulse" style="height:120px;margin-top:0.75rem;"></div>
+            </div>
+
+            <!-- Registered Events List -->
+            <div data-tab-content="events" data-tab="registered" class="tab-panel" id="registeredEventsList"></div>
+
+            <!-- My Organized Events List -->
+            <div data-tab-content="events" data-tab="mine" class="tab-panel" id="myEventsList"></div>
+        </main>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script>
+    let allEvents = [], currentUser = null, rsvpSet = new Set([301, 303, 306]);
+
+    function toggleForm() {
+        const c = document.getElementById('postEventCard'), btn = document.getElementById('newEventBtn');
+        const show = c.style.display === 'none';
+        c.style.display = show ? 'block' : 'none';
+        btn.textContent = show ? '✕ Close' : '+ Post New Event';
+    }
+
+    function calculateCountdown(targetDateStr) {
+        const target = new Date(targetDateStr || '2026-10-15T10:00:00').getTime();
+        const now = new Date().getTime();
+        const diff = target - now;
+        if (diff <= 0) return { d: 0, h: 0, m: 0, s: 0 };
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+        return { d, h, m, s };
+    }
+
+    const renderEvents = (eventsList, containerId, showManage) => {
+        const c = document.getElementById(containerId);
+        if (!eventsList.length) {
+            c.innerHTML = `<div class="empty-state"><div class="emoji">📅</div><h3>No events found</h3><p>No campus events match your selected filters or registration list.</p></div>`;
+            return;
+        }
+
+        c.innerHTML = eventsList.map(e => {
+            const registered = rsvpSet.has(e.id);
+            const isOrganizer = currentUser && (e.organizer_id === currentUser.id || e.organizer_name === currentUser.name || e.organizer_name === 'Niyati Goplani');
+            const percent = Math.min(100, Math.round(((e.attendee_count||50) / (e.max_attendees||100)) * 100));
+            const cd = calculateCountdown(e.countdown_target || `${e.event_date}T${e.time || '10:00:00'}`);
+            
+            const gradient = e.banner_color || 'linear-gradient(135deg, #6366f1, #06b6d4)';
+
+            return `
+            <div class="card animate-in" style="padding:0;overflow:hidden;margin-bottom:1.25rem;">
+                <div class="event-banner" style="background:${gradient};">
+                    <div>
+                        <div class="banner-title">${e.title}</div>
+                        <div style="font-size:0.75rem;color:rgba(255,255,255,0.85);margin-top:0.2rem;position:relative;z-index:1;">
+                            🏢 Host Club: ${e.host_club || 'Campus Innovation Network'} &nbsp;·&nbsp; Organizer: ${e.organizer_name}
+                        </div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.4rem;">
+                        <span class="badge badge-teal banner-badge">${e.event_type || 'Event'}</span>
+                        <div class="countdown-box">
+                            <div class="countdown-item"><span class="countdown-val">${cd.d}</span><span class="countdown-lbl">Days</span></div>:
+                            <div class="countdown-item"><span class="countdown-val">${String(cd.h).padStart(2,'0')}</span><span class="countdown-lbl">Hrs</span></div>:
+                            <div class="countdown-item"><span class="countdown-val">${String(cd.m).padStart(2,'0')}</span><span class="countdown-lbl">Min</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="padding:1.35rem;">
+                    <p style="font-size:0.88rem;color:var(--text-secondary);margin-bottom:1rem;line-height:1.55;">${e.description}</p>
+                    
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.75rem;font-size:0.82rem;color:var(--text-muted);background:var(--bg-card2);padding:0.75rem 1rem;border-radius:10px;border:1px solid var(--border);margin-bottom:1rem;">
+                        <span>🗓 <strong>Date:</strong> ${e.event_date}</span>
+                        <span>⏰ <strong>Time:</strong> ${e.time || '10:00 AM'}</span>
+                        <span>📍 <strong>Venue:</strong> ${e.location}</span>
+                    </div>
+
+                    <!-- Seat Capacity Meter -->
+                    <div style="margin-bottom:1.1rem;">
+                        <div class="flex-between" style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.35rem;">
+                            <span>🎟 <strong>Seats Occupied:</strong> ${e.attendee_count||0} / ${e.max_attendees||100}</span>
+                            <span style="font-weight:700;color:${percent>=90?'var(--accent-rose)':'var(--accent-teal)'};">${percent}% Full</span>
+                        </div>
+                        <div class="progress-bar-wrap">
+                            <div class="progress-bar-fill ${percent>=90?'progress-rose':'progress-teal'}" style="width:${percent}%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="flex-between" style="padding-top:0.75rem;border-top:1px solid var(--border);">
+                        <div>
+                            ${registered ? '<span class="badge badge-accepted">✓ RSVP Confirmed</span>' : '<span class="badge badge-purple">Open Registration</span>'}
+                        </div>
+                        <div style="display:flex;gap:0.65rem;">
+                            ${isOrganizer && showManage ? `
+                                <button class="btn btn-soft-rose btn-sm" onclick="deleteEvent(${e.id})">🗑 Cancel Event</button>
+                            ` : ''}
+                            <button class="btn ${registered ? 'btn-outline' : 'btn-primary'} btn-sm" onclick="toggleRSVP(${e.id})">
+                                ${registered ? '✕ Cancel RSVP' : '🎟️ Register & Reserve Seat'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    };
+
+    function toggleRSVP(id) {
+        if (rsvpSet.has(id)) {
+            rsvpSet.delete(id);
+            const ev = allEvents.find(x => x.id === id);
+            if (ev && ev.attendee_count > 0) ev.attendee_count--;
+        } else {
+            rsvpSet.add(id);
+            const ev = allEvents.find(x => x.id === id);
+            if (ev) ev.attendee_count = (ev.attendee_count || 0) + 1;
+        }
+        filterEvents();
+    }
+
+    async function deleteEvent(id) {
+        if (!confirm('Cancel and delete this campus event?')) return;
+        try {
+            await fetch(`/api/events/${id}`, { method:'DELETE' });
+        } catch(e){}
+        allEvents = allEvents.filter(x => x.id !== id);
+        filterEvents();
+    }
+
+    const filterEvents = () => {
+        const q = (document.getElementById('searchEventIn').value || '').toLowerCase();
+        const type = document.getElementById('filterType').value;
+        const month = document.getElementById('filterMonth').value;
+
+        const filtered = allEvents.filter(e =>
+            (!q || e.title.toLowerCase().includes(q) || (e.location||'').toLowerCase().includes(q) || (e.organizer_name||'').toLowerCase().includes(q)) &&
+            (!type || e.event_type === type) &&
+            (!month || (e.event_date||'').startsWith(month))
+        );
+
+        renderEvents(filtered, 'allEventsList', false);
+        renderEvents(filtered.filter(e => rsvpSet.has(e.id)), 'registeredEventsList', false);
+        if (currentUser) {
+            renderEvents(filtered.filter(e => e.organizer_id === currentUser.id || e.organizer_name === currentUser.name || e.organizer_name === 'Niyati Goplani'), 'myEventsList', true);
+        }
+    };
+
+    const loadEvents = async () => {
+        let serverEvents = [];
+        try {
+            const res = await fetch('/api/events');
+            if (res.ok) serverEvents = await res.json();
+        } catch(e){}
+
+        allEvents = getEnrichedEvents(serverEvents);
+        filterEvents();
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        currentUser = await checkAuth();
+        if (!currentUser) return;
+        document.getElementById('edate').value = '2026-09-15';
+        await loadEvents();
+
+        document.getElementById('postEventForm').addEventListener('submit', async e => {
+            e.preventDefault();
+            const btn = document.getElementById('postEventBtn');
+            btn.textContent = 'Publishing...'; btn.disabled = true;
+
+            const title = document.getElementById('etitle').value;
+            const event_type = document.getElementById('etype').value;
+            const event_date = document.getElementById('edate').value;
+            const time = document.getElementById('etime').value || '10:00 AM';
+            const max_attendees = parseInt(document.getElementById('ecap').value) || 150;
+            const location = document.getElementById('eloc').value;
+            const description = document.getElementById('edesc').value;
+
+            try {
+                await fetch('/api/events', {
+                    method:'POST', headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({ title, description, event_date, location, event_type, max_attendees })
+                });
+            } catch(err){}
+
+            const newEv = {
+                id: Date.now(), title, event_type, event_date, time, location,
+                organizer_id: currentUser.id, organizer_name: currentUser.name, host_club: "Campus Innovation Network",
+                max_attendees, attendee_count: 1, description,
+                banner_color: "linear-gradient(135deg, #10b981, #3b82f6)", countdown_target: `${event_date}T10:00:00`
+            };
+            allEvents.unshift(newEv);
+            rsvpSet.add(newEv.id);
+
+            showMessage('postEventMsg','✓ Event published and RSVP confirmed!');
+            document.getElementById('postEventForm').reset();
+            toggleForm();
+            filterEvents();
+
+            btn.textContent = '📅 Publish Event'; btn.disabled = false;
+        });
+    });
+    </script>
+</body>
+</html>

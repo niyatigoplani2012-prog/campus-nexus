@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Campus Nexus</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar" id="main-nav"></nav>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-section-label">Main Menu</div>
+            <ul class="sidebar-nav">
+                <li><a href="/dashboard.html" class="active"><span class="nav-icon">📊</span>Overview</a></li>
+                <li><a href="/projects.html"><span class="nav-icon">🔬</span>Projects</a></li>
+                <li><a href="/applications.html"><span class="nav-icon">📋</span>Applications</a></li>
+                <li><a href="/events.html"><span class="nav-icon">📅</span>Events</a></li>
+                <li><a href="/messages.html"><span class="nav-icon">💬</span>Messages</a></li>
+                <li><a href="/management.html"><span class="nav-icon">🏗️</span>Management</a></li>
+                <li><a href="/profile.html"><span class="nav-icon">👤</span>Profile</a></li>
+            </ul>
+            
+            <div style="margin-top:2rem; padding:1rem; background:var(--bg-card); border:1px solid var(--border); border-radius:12px;">
+                <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.4rem;">Campus Network</div>
+                <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; color:var(--text-dark); font-weight:600;">
+                    <span class="online-dot online"></span> 1,420 Students Online
+                </div>
+                <div style="font-size:0.78rem; color:var(--text-secondary); margin-top:0.3rem;">85 Faculty Mentors Active</div>
+            </div>
+        </aside>
+
+        <main class="dashboard-content">
+            <!-- Welcome Header Card -->
+            <div class="card animate-in" style="background:linear-gradient(135deg, rgba(99,102,241,0.18), rgba(6,182,212,0.12), rgba(20,23,36,0.95)); border:1px solid rgba(99,102,241,0.3); padding:1.75rem 2rem; margin-bottom:1.75rem;">
+                <div class="flex-between flex-wrap gap-2">
+                    <div>
+                        <div class="badge badge-purple mb-2">✦ Academic Term 2026 — Live Hub</div>
+                        <h2 style="font-family:'Plus Jakarta Sans',sans-serif; font-size:1.6rem; font-weight:800; color:var(--text-dark); letter-spacing:-0.02em;">
+                            Welcome back, <span id="welcomeName" style="color:var(--primary-light);">Student</span>! 👋
+                        </h2>
+                        <p style="color:var(--text-secondary); font-size:0.9rem; margin-top:0.35rem; max-width:620px;">
+                            Here is your live campus breakdown. You have <strong>2 pending application reviews</strong> and <strong>1 upcoming hackathon workshop</strong> this week.
+                        </p>
+                    </div>
+                    <div style="display:flex; gap:0.75rem; align-items:center;">
+                        <a href="/projects.html" class="btn btn-primary btn-sm">+ Post Project</a>
+                        <a href="/events.html" class="btn btn-teal btn-sm">+ Post Event</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid-cols-4 mb-3 animate-in animate-delay-1">
+                <div class="stat-card purple">
+                    <div class="stat-icon">🔭</div>
+                    <div class="stat-number" id="sProjs">0</div>
+                    <div class="stat-label">Active Campus Projects</div>
+                    <div style="font-size:0.72rem; color:var(--text-muted); margin-top:0.4rem;">Across 12 Departments</div>
+                </div>
+                <div class="stat-card teal">
+                    <div class="stat-icon">📅</div>
+                    <div class="stat-number" id="sEvents">0</div>
+                    <div class="stat-label">Upcoming Events & Hackathons</div>
+                    <div style="font-size:0.72rem; color:var(--text-muted); margin-top:0.4rem;">Next: NexusHack 2026</div>
+                </div>
+                <div class="stat-card rose">
+                    <div class="stat-icon">📋</div>
+                    <div class="stat-number" id="sApps">0</div>
+                    <div class="stat-label">Applications Tracker</div>
+                    <div style="font-size:0.72rem; color:var(--text-muted); margin-top:0.4rem;">2 Pending Review</div>
+                </div>
+                <div class="stat-card amber">
+                    <div class="stat-icon">💬</div>
+                    <div class="stat-number" id="sMsgs">0</div>
+                    <div class="stat-label">Unread Conversations</div>
+                    <div style="font-size:0.72rem; color:var(--text-muted); margin-top:0.4rem;">Faculty & Team Messages</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions Toolbar -->
+            <div class="grid-cols-4 mb-3 animate-in animate-delay-1">
+                <a href="/projects.html" class="quick-action-card">
+                    <div style="width:40px;height:40px;border-radius:10px;background:var(--primary-bg);display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:var(--primary-light);">🔬</div>
+                    <div>
+                        <div style="font-weight:700;font-size:0.88rem;">Explore Projects</div>
+                        <div style="font-size:0.75rem;color:var(--text-muted);">Find research teams</div>
+                    </div>
+                </a>
+                <a href="/applications.html" class="quick-action-card">
+                    <div style="width:40px;height:40px;border-radius:10px;background:var(--accent-teal-bg);display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:var(--accent-teal);">📋</div>
+                    <div>
+                        <div style="font-weight:700;font-size:0.88rem;">My Applications</div>
+                        <div style="font-size:0.75rem;color:var(--text-muted);">Review applicants</div>
+                    </div>
+                </a>
+                <a href="/messages.html" class="quick-action-card">
+                    <div style="width:40px;height:40px;border-radius:10px;background:var(--accent-amber-bg);display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:var(--accent-amber);">💬</div>
+                    <div>
+                        <div style="font-weight:700;font-size:0.88rem;">Direct Chat</div>
+                        <div style="font-size:0.75rem;color:var(--text-muted);">Message faculty</div>
+                    </div>
+                </a>
+                <a href="/profile.html" class="quick-action-card">
+                    <div style="width:40px;height:40px;border-radius:10px;background:var(--accent-rose-bg);display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:var(--accent-rose);">👤</div>
+                    <div>
+                        <div style="font-weight:700;font-size:0.88rem;">My Profile</div>
+                        <div style="font-size:0.75rem;color:var(--text-muted);">Update portfolio</div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Main Content Split -->
+            <div class="grid-cols-2 animate-in animate-delay-2" style="grid-template-columns: 1.6fr 1fr;">
+                <!-- Left Column -->
+                <div>
+                    <!-- Recent Projects -->
+                    <div class="card mb-3">
+                        <div class="flex-between mb-3">
+                            <div>
+                                <div class="section-title">🔬 Featured Campus Projects</div>
+                                <div style="font-size:0.78rem;color:var(--text-muted);">Active multidisciplinary research collaborations</div>
+                            </div>
+                            <a href="/projects.html" style="font-size:0.8rem;color:var(--primary-light);text-decoration:none;font-weight:600;">View All 15+ →</a>
+                        </div>
+                        <div id="recentProjects">
+                            <div class="loading-pulse" style="height:64px;"></div>
+                            <div class="loading-pulse" style="height:64px;margin-top:0.5rem;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Live Campus Activity Feed -->
+                    <div class="card">
+                        <div class="section-title mb-3">⚡ Live Campus Stream</div>
+                        <div class="timeline-stream" id="activityStream">
+                            <!-- Rendered by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column Widgets -->
+                <div>
+                    <!-- Trending Events -->
+                    <div class="card mb-3">
+                        <div class="flex-between mb-3">
+                            <div>
+                                <div class="section-title">🎗️ Campus Events Spotlight</div>
+                                <div style="font-size:0.78rem;color:var(--text-muted);">Register & reserve your seat</div>
+                            </div>
+                            <a href="/events.html" style="font-size:0.8rem;color:var(--primary-light);text-decoration:none;font-weight:600;">View All →</a>
+                        </div>
+                        <div id="recentEvents">
+                            <div class="loading-pulse" style="height:64px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Mini Calendar Widget -->
+                    <div class="calendar-widget mb-3">
+                        <div class="flex-between">
+                            <div style="font-weight:700;font-size:0.92rem;color:var(--text-dark);" id="calMonthHead">September 2026</div>
+                            <span class="badge badge-teal">Academic Schedule</span>
+                        </div>
+                        <div class="calendar-grid">
+                            <div class="calendar-day-head">Su</div><div class="calendar-day-head">Mo</div><div class="calendar-day-head">Tu</div>
+                            <div class="calendar-day-head">We</div><div class="calendar-day-head">Th</div><div class="calendar-day-head">Fr</div><div class="calendar-day-head">Sa</div>
+                            <!-- JS filled days -->
+                            <div class="calendar-day">30</div><div class="calendar-day">31</div><div class="calendar-day">1</div>
+                            <div class="calendar-day">2</div><div class="calendar-day">3</div><div class="calendar-day">4</div><div class="calendar-day">5</div>
+                            <div class="calendar-day">6</div><div class="calendar-day">7</div><div class="calendar-day">8</div>
+                            <div class="calendar-day">9</div><div class="calendar-day today has-event">10</div><div class="calendar-day">11</div><div class="calendar-day">12</div>
+                            <div class="calendar-day">13</div><div class="calendar-day">14</div><div class="calendar-day">15</div>
+                            <div class="calendar-day">16</div><div class="calendar-day">17</div><div class="calendar-day has-event">18</div><div class="calendar-day">19</div>
+                            <div class="calendar-day">20</div><div class="calendar-day">21</div><div class="calendar-day has-event">22</div><div class="calendar-day">23</div>
+                            <div class="calendar-day">24</div><div class="calendar-day">25</div><div class="calendar-day">26</div>
+                            <div class="calendar-day">27</div><div class="calendar-day has-event">28</div><div class="calendar-day">29</div><div class="calendar-day">30</div>
+                        </div>
+                    </div>
+
+                    <!-- Faculty Mentors Directory Spotlight -->
+                    <div class="card">
+                        <div class="section-title mb-2">🎓 Lead Faculty Mentors</div>
+                        <div id="facultyList">
+                            <!-- Rendered by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/utils.js"></script>
+    <script>
+    const CAT_COLORS = { 'Web Dev':'purple','Mobile':'teal','AI/ML':'rose','Data Science':'amber','IoT':'teal','Research':'purple','Design':'rose','General':'purple','Robotics':'rose','BioTech':'teal','Cyber Security':'amber' };
+    const CAT_EMOJIS = { 'Web Dev':'🌐','Mobile':'📱','AI/ML':'🤖','Data Science':'📊','IoT':'🔌','Research':'📚','Design':'🎨','General':'🔧','Robotics':'🦾','BioTech':'🧬','Cyber Security':'🔐' };
+
+    const loadDashboard = async () => {
+        let projs = [], events = [], apps = [], msgs = [];
+        try {
+            const [pRes, eRes, aRes, mRes] = await Promise.all([
+                fetch('/api/projects').catch(() => null),
+                fetch('/api/events').catch(() => null),
+                fetch('/api/applications/sent').catch(() => null),
+                fetch('/api/messages').catch(() => null)
+            ]);
+            if (pRes && pRes.ok) projs = await pRes.json();
+            if (eRes && eRes.ok) events = await eRes.json();
+            if (aRes && aRes.ok) apps = await aRes.json();
+            if (mRes && mRes.ok) msgs = await mRes.json();
+        } catch (e) {
+            console.log('Using seeded dataset for dashboard');
+        }
+
+        // Merge with canonical campus dataset
+        projs = getEnrichedProjects(projs);
+        events = getEnrichedEvents(events);
+        const enrichedApps = getEnrichedApplications([], apps);
+        msgs = getEnrichedMessages(msgs);
+
+        document.getElementById('sProjs').textContent = projs.length;
+        document.getElementById('sEvents').textContent = events.length;
+        document.getElementById('sApps').textContent = enrichedApps.sent.length + enrichedApps.received.length;
+        document.getElementById('sMsgs').textContent = msgs.length;
+
+        // Render Recent Projects
+        const pL = document.getElementById('recentProjects');
+        pL.innerHTML = projs.slice(0, 4).map(p => `
+            <div class="card-flat" style="padding:1.1rem;margin-bottom:0.75rem;">
+                <div class="flex-between">
+                    <div style="font-weight:700;font-size:0.95rem;color:var(--text-dark);">${p.title}</div>
+                    <span class="badge badge-${CAT_COLORS[p.category]||'purple'}">${CAT_EMOJIS[p.category]||'🔬'} ${p.category}</span>
+                </div>
+                <p style="font-size:0.82rem;color:var(--text-secondary);margin:0.4rem 0;line-height:1.4;">${p.description.substring(0, 110)}...</p>
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.78rem;color:var(--text-muted);">
+                    <span>👤 Owner: <strong style="color:var(--text-secondary);">${p.owner_name}</strong> &nbsp;·&nbsp; 🎓 Mentor: ${p.mentor || 'Faculty Board'}</span>
+                    <span style="font-family:'JetBrains Mono',monospace;color:var(--primary-light);">👥 ${p.team_size} members</span>
+                </div>
+            </div>
+        `).join('');
+
+        // Render Recent Events
+        const eL = document.getElementById('recentEvents');
+        eL.innerHTML = events.slice(0, 3).map(e => `
+            <div class="card-flat" style="padding:1.1rem;margin-bottom:0.75rem;">
+                <div class="flex-between">
+                    <div style="font-weight:700;font-size:0.92rem;color:var(--text-dark);">${e.title}</div>
+                    <span class="badge badge-teal">${e.event_type}</span>
+                </div>
+                <div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.35rem;">
+                    📍 ${e.location} &nbsp;·&nbsp; 🗓 ${e.event_date} at ${e.time || '10:00 AM'}
+                </div>
+                <div style="margin-top:0.5rem;display:flex;justify-content:space-between;align-items:center;font-size:0.75rem;color:var(--text-secondary);">
+                    <span>Organized by: <strong>${e.organizer_name}</strong></span>
+                    <span class="badge badge-purple">Seats: ${e.attendee_count}/${e.max_attendees}</span>
+                </div>
+            </div>
+        `).join('');
+
+        // Render Activity Stream
+        const actEl = document.getElementById('activityStream');
+        actEl.innerHTML = window.CAMPUS_DATA.activityStream.map(a => `
+            <div class="timeline-item">
+                <div class="timeline-icon-box" style="background:var(--accent-${a.color}-bg);color:var(--accent-${a.color}); border:1px solid rgba(255,255,255,0.08);">${a.icon}</div>
+                <div style="flex:1;">
+                    <div style="font-size:0.85rem;color:var(--text-dark);">
+                        <strong style="color:var(--primary-light);">${a.user}</strong> ${a.action} <strong style="color:var(--text-dark);">${a.target}</strong>
+                    </div>
+                    <div style="font-size:0.72rem;color:var(--text-muted);margin-top:0.15rem;font-family:'JetBrains Mono',monospace;">${a.time}</div>
+                </div>
+            </div>
+        `).join('');
+
+        // Render Faculty Mentors
+        const facEl = document.getElementById('facultyList');
+        facEl.innerHTML = window.CAMPUS_DATA.faculty.slice(0, 4).map(f => `
+            <div style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0;border-bottom:1px solid var(--border);">
+                <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent-teal));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.82rem;">${f.avatar}</div>
+                <div style="flex:1;overflow:hidden;">
+                    <div style="font-weight:700;font-size:0.85rem;color:var(--text-dark);">${f.name}</div>
+                    <div style="font-size:0.75rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.title}</div>
+                </div>
+                <a href="/messages.html?to=${f.id}" class="btn btn-ghost btn-sm" style="padding:0.25rem 0.6rem;font-size:0.75rem;">💬 Chat</a>
+            </div>
+        `).join('');
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        const user = await checkAuth();
+        if(!user) return;
+        document.getElementById('welcomeName').textContent = user.name || 'Niyati Goplani';
+        loadDashboard();
+    });
+    </script>
+</body>
+</html>
